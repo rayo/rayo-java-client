@@ -3,8 +3,8 @@
 This client library lets you build Rayo applications in Java. It is a very lightweight library that lets you create Rayo applications with very few lines of code. 
 
 ## Samples
-
-Feel free to check out the samples available [here](https://github.com/rayo/rayo-server/tree/master/rayo-java-client/src/main/java/samples). You can run any of these samples from the command line with Maven. Here is an example:
+https://github.com/rayo/rayo-java-client/tree/master/src/main/java/samples
+Feel free to check out the samples available [here](https://github.com/rayo/rayo-java-client/tree/master/src/main/java/samples). You can run any of these samples from the command line with Maven. Here is an example:
 
         mvn clean compile
         mvn exec:java -Dexec.mainClass="samples.TextSaySample" -Dexec.classpathScope=compile -Ddetail=true
@@ -33,7 +33,7 @@ The easiest way to use the Rayo's Java Client library is to create an instance o
 	// And finally disconnect
 	rayo.disconnect();
 
-All the samples available in the [samples source folder](https://github.com/rayo/rayo-server/tree/master/rayo-java-client/src/main/java/samples) use the [RayoClient](https://github.com/rayo/rayo-server/blob/master/rayo-java-client/src/main/java/com/voxeo/rayo/client/RayoClient.java) class. This is for example part of the source code of the [Conference Sample](https://github.com/rayo/rayo-server/tree/master/rayo-java-client/src/main/java/samples):
+All the samples available in the [samples source folder](https://github.com/rayo/rayo-java-client/tree/master/src/main/java/samples) use the [RayoClient](https://github.com/rayo/rayo-server/blob/master/rayo-java-client/src/main/java/com/voxeo/rayo/client/RayoClient.java) class. This is for example part of the source code of the [Conference Sample](https://github.com/rayo/rayo-java-client/tree/master/src/main/java/samples):
 
 	public void run() throws Exception {
 		
@@ -59,5 +59,5 @@ RayoClient is an abstraction class that lets you to quickly create Rayo applicat
 
 XmppConnection instances let you can manage the connection with the Rayo server. You can listen and react to all type of events and stanzas. You can manage the authentication process. You can create your own IQ stanzas and send it to the server. You can send stanzas synchronously or asynchronously or register callbacks for your messages. 
 
-There is lots of stuff. This documentation will be improved in the future but right now we recommend you to start looking at the [tons of different examples available as unit tests](https://github.com/rayo/rayo-server/tree/master/rayo-java-client/src/test/java/com/voxeo/rayo/client/test) that show how the API can be used. 
+There is lots of stuff. This documentation will be improved in the future but right now we recommend you to start looking at the [tons of different examples available as unit tests](https://github.com/rayo/rayo-java-client/tree/master/src/test/java/com/voxeo/rayo/client/test) that show how the API can be used. 
 

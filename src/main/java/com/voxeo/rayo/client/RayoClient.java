@@ -379,7 +379,7 @@ public class RayoClient {
 
 	public VerbRef outputSsml(String ssml) throws XmppException {
 		
-		return saySsml(ssml, lastCallId);
+		return outputSsml(ssml, lastCallId);
 	}
 
 	public VerbRef outputSsml(String ssml, String callId) throws XmppException {

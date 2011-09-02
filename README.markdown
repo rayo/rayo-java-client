@@ -13,7 +13,7 @@ All the samples try to connect with and username "userc" and a password "1" to a
  
 **Troubleshooting**
 
-The Rayo Java Client library depends on [Rayo](http://www.github.com/rayo/rayo-server). If you try to run the samples or you try to build the Jar file then you will need to have the latest Tropo2 jars in your repository. So, you may need to grab a copy of Rayo and run mvn clean install first.
+The Rayo Java Client library depends on [Rayo](http://www.github.com/rayo/rayo-server). If you try to run the samples or you try to build the Jar file then you will need to have the latest Rayo jars in your repository. So, you may need to grab a copy of Rayo and run mvn clean install first.
 
 ## Using the Rayo client library 
 

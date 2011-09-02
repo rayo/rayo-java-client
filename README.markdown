@@ -3,7 +3,7 @@
 This client library lets you build Rayo applications in Java. It is a very lightweight library that lets you create Rayo applications with very few lines of code. 
 
 ## Samples
-https://github.com/rayo/rayo-java-client/tree/master/src/main/java/samples
+
 Feel free to check out the samples available [here](https://github.com/rayo/rayo-java-client/tree/master/src/main/java/samples). You can run any of these samples from the command line with Maven. Here is an example:
 
         mvn clean compile

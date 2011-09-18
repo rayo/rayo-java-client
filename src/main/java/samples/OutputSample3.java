@@ -7,13 +7,13 @@ public class OutputSample3 extends BaseSample {
 
 	public void run() throws Exception {
 
-		client.waitFor("offer");
-		client.answer();
+		String callId = client.waitForOffer().getCallId();
+		client.answer(callId);
 		Output output = new Output();
 		output.setPrompt(new Ssml("<speak><say-as interpret-as=\"ordinal\">100</say-as></speak>"));
-		client.output(output);
+		client.output(output, callId);
 		Thread.sleep(5000);
-		client.hangup();
+		client.hangup(callId);
 	}
 	
 	public static void main(String[] args) throws Exception {

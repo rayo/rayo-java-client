@@ -7,13 +7,13 @@ public class OutputSample2 extends BaseSample {
 
 	public void run() throws Exception {
 		// Invalid SSML. Should send an error
-		client.waitFor("offer");
-		client.answer();
+		String callId = client.waitForOffer().getCallId();
+		client.answer(callId);
 		Output output = new Output();
 		output.setPrompt(new Ssml("<output-as interpret-as=\"ordinal\">100</output-as>"));
-		client.output(output);
+		client.output(output, callId);
 		Thread.sleep(5000);
-		client.hangup();
+		client.hangup(callId);
 	}
 	
 	public static void main(String[] args) throws Exception {

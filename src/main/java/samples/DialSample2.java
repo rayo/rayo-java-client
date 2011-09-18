@@ -15,9 +15,8 @@ public class DialSample2 extends BaseSample {
 
 	public void run() throws Exception {
 		
-		client.waitFor("offer");
-		client.answer();
-		String callId = client.getLastCallId();
+		String callId = client.waitForOffer().getCallId();
+		client.answer(callId);
 		
 		DialCommand dial = new DialCommand();
 		dial.setTo(new URI("sip:mperez@127.0.0.1:3060"));
@@ -39,9 +38,9 @@ public class DialSample2 extends BaseSample {
 		VerbRef dialRef = client.dial(dial);
 		client.waitFor("answered");
 		Thread.sleep(6000);
-		client.unjoin(dialRef.getVerbId(), JoinDestinationType.CALL);
+		client.unjoin(dialRef.getVerbId(), JoinDestinationType.CALL, callId);
 		Thread.sleep(6000);
-		client.hangup();
+		client.hangup(callId);
 	}
 		
 	public static void main(String[] args) throws Exception {

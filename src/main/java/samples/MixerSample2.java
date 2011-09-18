@@ -10,10 +10,9 @@ public class MixerSample2 extends BaseSample {
 		
 		connect("localhost", "userc", "1");
 		
-		client.waitFor("offer");
-		String firstCall = client.getLastCallId();
+		String firstCall = client.waitForOffer().getCallId();
 		client.answer(firstCall);
-		client.say("We are going to create a conference and then say something to it");
+		client.say("We are going to create a conference and then say something to it", firstCall);
 		Thread.sleep(10000);
 		Conference conference = buildConference();
 		client.conference(conference, firstCall);
@@ -22,7 +21,7 @@ public class MixerSample2 extends BaseSample {
 		//Thread.sleep(3000);
 		client.say("You obviously didn't heard that", conference.getRoomName());
 		Thread.sleep(10000);
-		client.hangup();
+		client.hangup(firstCall);
 	}
 	
 	private Conference buildConference() {

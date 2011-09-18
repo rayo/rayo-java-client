@@ -9,14 +9,14 @@ public class RecordSample2 extends BaseSample {
 
 	public void run() throws Exception {
 		
-		client.waitFor("offer");
-		client.answer();
-		client.say(new URI("http://ccmixter.org/content/DoKashiteru/DoKashiteru_-_you_(na-na-na-na).mp3"));
+		String callId = client.waitForOffer().getCallId();
+		client.answer(callId);
+		client.say(new URI("http://ccmixter.org/content/DoKashiteru/DoKashiteru_-_you_(na-na-na-na).mp3"), callId);
 		Record record = new Record();
-		VerbRef ref = client.record(record);
+		VerbRef ref = client.record(record, callId);
 		client.stop(ref);
 		Thread.sleep(10000);		
-		client.hangup();
+		client.hangup(callId);
 		Thread.sleep(10000);
 	}
 	

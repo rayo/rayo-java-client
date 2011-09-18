@@ -9,6 +9,17 @@ import javax.media.mscontrol.join.Joinable;
 
 import org.joda.time.Duration;
 
+import com.rayo.core.AnswerCommand;
+import com.rayo.core.CallCommand;
+import com.rayo.core.CallRejectReason;
+import com.rayo.core.DialCommand;
+import com.rayo.core.DtmfCommand;
+import com.rayo.core.HangupCommand;
+import com.rayo.core.JoinCommand;
+import com.rayo.core.JoinDestinationType;
+import com.rayo.core.OfferEvent;
+import com.rayo.core.RejectCommand;
+import com.rayo.core.UnjoinCommand;
 import com.rayo.core.verb.Ask;
 import com.rayo.core.verb.Choices;
 import com.rayo.core.verb.ClientPauseCommand;
@@ -29,24 +40,12 @@ import com.rayo.core.verb.Transfer;
 import com.rayo.core.verb.UnholdCommand;
 import com.rayo.core.verb.UnmuteCommand;
 import com.rayo.core.verb.VerbRef;
-import com.rayo.core.AnswerCommand;
-import com.rayo.core.CallCommand;
-import com.rayo.core.CallRejectReason;
-import com.rayo.core.DialCommand;
-import com.rayo.core.DtmfCommand;
-import com.rayo.core.HangupCommand;
-import com.rayo.core.JoinCommand;
-import com.rayo.core.JoinDestinationType;
-import com.rayo.core.RejectCommand;
-import com.rayo.core.UnjoinCommand;
 import com.voxeo.moho.Participant.JoinType;
 import com.voxeo.rayo.client.auth.AuthenticationListener;
 import com.voxeo.rayo.client.filter.XmppObjectFilter;
-import com.voxeo.rayo.client.listener.RayoMessageListener;
 import com.voxeo.rayo.client.listener.StanzaListener;
 import com.voxeo.servlet.xmpp.rayo.extensions.Extension;
 import com.voxeo.servlet.xmpp.rayo.stanza.IQ;
-import com.voxeo.servlet.xmpp.rayo.stanza.Stanza;
 
 /**
  * This class servers as a client to the Rayo XMPP platform.
@@ -58,8 +57,6 @@ public class RayoClient {
 
 	private final XmppConnection connection;
 	private static final String DEFAULT_RESOURCE = "voxeo";
-
-	private String lastCallId;
 
 	/**
 	 * Creates a new client object. This object will be used to interact with an Rayo server.
@@ -109,6 +106,9 @@ public class RayoClient {
 		
 		connection.connect();
 		connection.login(username, password, resource);
+		/*
+		 * Left as example
+		 * 
 		connection.addStanzaListener(new RayoMessageListener("offer") {
 			
 			@Override
@@ -118,7 +118,8 @@ public class RayoClient {
 				Stanza stanza = (Stanza)object;
 				lastCallId = stanza.getFrom().substring(0, stanza.getFrom().indexOf('@'));
 			}
-		});		
+		});
+		*/		
 	}
 
 	/**
@@ -178,6 +179,19 @@ public class RayoClient {
 	public void disconnect() throws XmppException {
 		
 		connection.disconnect();
+	}
+	
+	
+	/**
+	 * <p>Waits for an Offer Event. Shortcut method to wait for an incoming call.</p>
+	 * 
+	 * @return OfferEvent Offer event that has been received
+	 * 
+	 * @throws XmppException If there is any problem waiting for offer event
+	 */
+	public OfferEvent waitForOffer() throws XmppException {
+		
+		return waitFor("offer", OfferEvent.class);
 	}
 	
 	/**
@@ -257,18 +271,6 @@ public class RayoClient {
 		Extension extension = (Extension)connection.waitForExtension(extensionName, timeout);
 		return (T)extension.getObject();
 	}
-
-	/**
-	 * Answers the latest call that this connection has received from the Rayo server
-	 * 
-	 * @throws XmppException If there is any issue while answering the call
-	 */
-	public void answer() throws XmppException {
-		
-		if (lastCallId != null) {
-			answer(lastCallId);
-		}
-	}
 	
 	/**
 	 * Answers the call with the id specified as a parameter. 
@@ -285,18 +287,6 @@ public class RayoClient {
 			.setTo(buildTo(callId))
 			.setChild(Extension.create(answer));
 		connection.send(iq);		
-	}
-
-	/**
-	 * Accepts the latest call that this connection has received from the Rayo server
-	 * 
-	 * @throws XmppException If there is any issue while accepting the call
-	 */
-	public void accept() throws XmppException {
-		
-		if (lastCallId != null) {
-			accept(lastCallId);
-		}
 	}
 	
 	/**
@@ -316,21 +306,6 @@ public class RayoClient {
 		connection.send(iq);		
 	}	
 	
-
-	/**
-	 * Rejects the latest call that this connection has received from the Rayo server
-	 * 
-	 * @param reason Code of the reason to reject the call
-	 * 
-	 * @throws XmppException If there is any issue while rejecting the call
-	 */
-	public void reject(int reason) throws XmppException {
-		
-		if (lastCallId != null) {
-			reject(CallRejectReason.valueOf(reason), lastCallId);
-		}
-	}
-	
 	/**
 	 * Rejects the latest call that this connection has received from the Rayo server
 	 * 
@@ -341,18 +316,6 @@ public class RayoClient {
 	public void reject(String callId) throws XmppException {
 
 		reject(CallRejectReason.DECLINE, callId);
-	}
-	
-	/**
-	 * Rejects the latest call that this connection has received from the Rayo server
-	 * 
-	 * @throws XmppException If there is any issue while rejecting the call
-	 */
-	public void reject() throws XmppException {
-		
-		if (lastCallId != null) {
-			reject(lastCallId);
-		}
 	}
 	
 	/**
@@ -371,75 +334,21 @@ public class RayoClient {
 			.setChild(Extension.create(reject));
 		connection.send(iq);		
 	}	
-	
-	public VerbRef outputAudio(String audio) throws XmppException, URISyntaxException {
-	
-		return output(new URI(audio));
-	}
-
-	public VerbRef outputSsml(String ssml) throws XmppException {
-		
-		return outputSsml(ssml, lastCallId);
-	}
 
 	public VerbRef outputSsml(String ssml, String callId) throws XmppException {
 		
-		return internalOutput(new Ssml(ssml), lastCallId);
+		return internalOutput(new Ssml(ssml), callId);
 	}
-
-	public VerbRef output(URI uri) throws XmppException {
-	
-		if (lastCallId != null) {
-			return output(uri, lastCallId);
-		}
-		return null;
-	}	
 
 	public VerbRef output(URI uri, String callId) throws XmppException {
 
 		return internalOutput(new Ssml(String.format("<audio src=\"%s\"/>",uri.toString())), callId);
-	}
-
-	public VerbRef output(String text) throws XmppException {
-	
-		if (lastCallId != null) {
-			return say(text, lastCallId);
-		}
-		return null;
 	}	
 
 	public VerbRef output(String text, String callId) throws XmppException {
 
 		return internalOutput(new Ssml(text), callId);
 	}
-
-	/**
-	 * Sends a 'Say' command to Rayo that will play the specified audio file
-	 * 
-	 * @param audio URI to the audio file
-	 * @return SayRef SayRef instance that allows to handle the say stream
-	 * 
-	 * @throws XmppException If there is any issues while sending the say command
-	 * @throws URISyntaxException If the specified audio file is not a valid URI
-	 */
-	public VerbRef sayAudio(String audio) throws XmppException, URISyntaxException {
-	
-		return say(new URI(audio));
-	}
-	
-	/**
-	 * Sends a 'Say' command including some SSML text
-	 * 
-	 * @param ssml SSML text
-	 * 
-	 * @return SayRef SayRef instance that allows to handle the say stream
-	 * 
-	 * @throws XmppException If there is any issues while sending the say command
-	 */
-	public VerbRef saySsml(String ssml) throws XmppException {
-		
-		return saySsml(ssml, lastCallId);
-	}
 	
 	/**
 	 * Sends a 'Say' command including some SSML text
@@ -447,37 +356,37 @@ public class RayoClient {
 	 * @param ssml SSML text
 	 * @param callId Id of the call to which the say command will be sent 
 	 * 
-	 * @return SayRef SayRef instance that allows to handle the say stream
+	 * @return VerbRef VerbRef instance that allows to handle the say stream
 	 * 
 	 * @throws XmppException If there is any issues while sending the say command
 	 */
 	public VerbRef saySsml(String ssml, String callId) throws XmppException {
 		
-		return internalSay(new Ssml(ssml), lastCallId);
+		return internalSay(new Ssml(ssml), callId);
+	}
+	
+	/**
+	 * Sends a 'Say' command to Rayo that will play the specified audio file
+	 * 
+	 * @param audio URI to the audio file
+	 * @param callId Id of the call
+	 * 
+	 * @return VerbRef VerbRef instance that allows to handle the say stream
+	 * 
+	 * @throws XmppException If there is any issues while sending the say command
+	 * @throws URISyntaxException If the specified audio file is not a valid URI
+	 */
+	public VerbRef sayAudio(String audio, String callId) throws XmppException, URISyntaxException {
+	
+		return say(new URI(audio), callId);
 	}
 	
 	/**
 	 * Sends a 'Say' command to Rayo that will play the specified audio file
 	 * 
 	 * @param uri URI to an audio resource that will be played
-	 * @return SayRef SayRef instance that allows to handle the say stream
-	 * 
-	 * @throws XmppException If there is any issues while sending the say command
-	 */
-	public VerbRef say(URI uri) throws XmppException {
-	
-		if (lastCallId != null) {
-			return say(uri, lastCallId);
-		}
-		return null;
-	}	
-	
-	/**
-	 * Sends a 'Say' command to Rayo that will play the specified audio file
-	 * 
-	 * @param uri URI to an audio resource that will be played
 	 * @param callId Id of the call to which the say command will be sent 
-	 * @return SayRef SayRef instance that allows to handle the say stream
+	 * @return VerbRef VerbRef instance that allows to handle the say stream
 	 * 
 	 * @throws XmppException If there is any issues while sending the say command
 	 */
@@ -485,30 +394,13 @@ public class RayoClient {
 
 		return internalSay(new Ssml(String.format("<audio src=\"%s\"/>",uri.toString())), callId);
 	}
-
-	
-	/**
-	 * Instructs Rayo to say the specified text
-	 * 
-	 * @param text Text that we want to say
-	 * @return SayRef SayRef instance that allows to handle the say stream
-	 * 
-	 * @throws XmppException If there is any issues while sending the say command
-	 */
-	public VerbRef say(String text) throws XmppException {
-	
-		if (lastCallId != null) {
-			return say(text, lastCallId);
-		}
-		return null;
-	}	
 	
 	/**
 	 * Instructs Rayo to say the specified text on the call with the specified id
 	 * 
 	 * @param text Text that we want to say
 	 * @param callId Id of the call to which the say command will be sent 
-	 * @return SayRef SayRef instance that allows to handle the say stream
+	 * @return VerbRef VerbRef instance that allows to handle the say stream
 	 * 
 	 * @throws XmppException If there is any issues while sending the say command
 	 */
@@ -516,54 +408,11 @@ public class RayoClient {
 
 		return internalSay(new Ssml(text), callId);
 	}
-	
-	/**
-	 * Transfer the last received call to another phone speaking some text before doing the transfer.
-	 * 
-	 * @param text Text that will be prompted to the user
-	 * @param to URI of the call destination
-	 * 
-	 * @throws XmppException If there is any issue while transfering the call
-	 */
-	public void transfer(String text, URI to) throws XmppException {
-
-		List<URI> list = new ArrayList<URI>();
-		list.add(to);
-
-		if (lastCallId != null) {
-			transfer(text, list, lastCallId);
-		}
-	}
-
-	/**
-	 * Transfers the last received call to another destination
-	 * 
-	 * @param text URI of the call destination
-	 * 
-	 * @throws XmppException If there is any issue while transfering the call
-	 * @throws URISyntaxException If the provided destination is not a valid URI
-	 */
-	public void transfer(String text) throws XmppException, URISyntaxException {
-
-		transfer(new URI(text));
-	}
-	
-	/**
-	 * Transfers the last received call to another destination
-	 * 
-	 * @param to URI of the call destination
-	 * 
-	 * @throws XmppException If there is any issue while transfering the call
-	 */
-	public void transfer(URI to) throws XmppException {
-
-		transfer(null, to);
-	}
 
 	/**
 	 * Transfers a specific call to another destination
 	 * 
-	 * @param text Text that will be prompted to the user
+	 * @param to URI where the call will be transfered
 	 * @param callId Id of the call we want to transfer
 	 * 
 	 * @throws XmppException If there is any issue while transfering the call
@@ -573,6 +422,21 @@ public class RayoClient {
 		List<URI> list = new ArrayList<URI>();
 		list.add(to);
 		transfer(null, list, callId);
+	}
+	
+
+	/**
+	 * Transfers a specific call to another destination
+	 * 
+	 * @param to URI where the call will be transfered
+	 * @param callId Id of the call we want to transfer
+	 * 
+	 * @throws XmppException If there is any issue while transfering the call
+	 * @throws URISyntaxException If an invalid URI is passed as a parameter
+	 */
+	public void transfer(String to, String callId) throws XmppException, URISyntaxException {
+
+		transfer(new URI(to), callId);
 	}
 
 	public void transfer(List<URI> to, String callId) throws XmppException {
@@ -607,25 +471,11 @@ public class RayoClient {
 			.setChild(Extension.create(transfer));
 		connection.send(iq);
 	}
-
-	public void hold() throws XmppException {
-		
-		if (lastCallId != null) {
-			hold(lastCallId);
-		}
-	}
 	
 	public void hold(String callId) throws XmppException {
 
 		HoldCommand hold = new HoldCommand();
 		command(hold,callId);
-	}
-
-	public void unhold() throws XmppException {
-		
-		if (lastCallId != null) {
-			unhold(lastCallId);
-		}
 	}
 	
 	public void unhold(String callId) throws XmppException {
@@ -633,25 +483,11 @@ public class RayoClient {
 		UnholdCommand unhold = new UnholdCommand();
 		command(unhold,callId);
 	}
-
-	public void mute() throws XmppException {
-		
-		if (lastCallId != null) {
-			mute(lastCallId);
-		}
-	}
 	
 	public void mute(String callId) throws XmppException {
 
 		MuteCommand mute = new MuteCommand();
 		command(mute,callId);
-	}
-
-	public void unmute() throws XmppException {
-		
-		if (lastCallId != null) {
-			unmute(lastCallId);
-		}
 	}
 	
 	public void unmute(String callId) throws XmppException {
@@ -727,21 +563,6 @@ public class RayoClient {
 			return null;
 		}
 	}
-
-	/**
-	 * Instructs Rayo to ask a question with the specified choices on the latest active call  
-	 * 
-	 * @param text Text that will be prompted
-	 * @param choicesText Choices
-	 * 
-	 * @throws XmppException If there is any issue while asking the question 
-	 */
-	public void ask(String text, String choicesText) throws XmppException {
-
-		if (lastCallId != null) {
-			ask(text,choicesText,lastCallId);
-		}
-	}	
 	
 	/**
 	 * Instructs Rayo to ask a question with the specified choices on the call with the given id  
@@ -780,24 +601,9 @@ public class RayoClient {
 	 * Creates a conference and joins the last active call 
 	 * 
 	 * @param roomName Id of the conference
-	 * 
-	 * @throws XmppException If there is any problem while creating the conference
-	 */
-	public VerbRef conference(String roomName) throws XmppException {
-	
-		if (lastCallId != null) {
-			return conference(roomName, lastCallId);
-		}
-		return null;
-	}
-	
-	/**
-	 * Creates a conference and joins the last active call 
-	 * 
-	 * @param roomName Id of the conference
 	 * @param callId Id of the call that will be starting the conference
 	 * 
-	 * @return ConferenceRef A reference to the conference object that has been created
+	 * @return VerbRef A reference to the conference object that has been created
 	 * 
 	 * @throws XmppException If there is any problem while creating the conference
 	 */
@@ -813,26 +619,9 @@ public class RayoClient {
 	 * Creates a conference and joins the last active call 
 	 * 
 	 * @param conference Conference object
-	 * 
-	 * @return ConferenceRef A reference to the conference object that has been created
-	 * 
-	 * @throws XmppException If there is any problem while creating the conference
-	 */
-	public VerbRef conference(Conference conference) throws XmppException {
-		
-		if (lastCallId != null) {
-			return conference(conference, lastCallId);
-		}
-		return null;
-	}
-	
-	/**
-	 * Creates a conference and joins the last active call 
-	 * 
-	 * @param conference Conference object
 	 * @param callId Id of the call that will be starting the conference
 	 * 
-	 * @return ConferenceRef A reference to the conference object that has been created
+	 * @return VerbRef A reference to the conference object that has been created
 	 * 
 	 * @throws XmppException If there is any problem while creating the conference
 	 */
@@ -865,11 +654,6 @@ public class RayoClient {
 		output.setPrompt(item);
 		
 		return output(output, callId);
-	}
-	
-	public VerbRef output(Output output) throws XmppException {
-		
-		return output(output, lastCallId);
 	}
 	
 	public VerbRef output(Output output, String callId) throws XmppException {
@@ -958,25 +742,9 @@ public class RayoClient {
 		connection.send(iq);
 	}
 	
-	public VerbRef record() throws XmppException {
-		
-		if (lastCallId != null) {
-			return record(lastCallId);
-		}
-		return null;
-	}
-	
 	public VerbRef record(String callId) throws XmppException {
 		
 		return record(new Record(), callId);
-	}
-	
-	public VerbRef record(Record record) throws XmppException {
-		
-		if (lastCallId != null) {
-			return record(record, lastCallId);
-		}
-		return null;
 	}
 	
 	public VerbRef record(Record record, String callId) throws XmppException {
@@ -987,16 +755,6 @@ public class RayoClient {
 			.setChild(Extension.create(record));
 		
 		return sendAndGetRef(callId, iq);
-	}
-	
-	/**
-	 * Hangs up the latest active call
-	 */
-	public void hangup() throws XmppException {
-		
-		if (lastCallId != null) {
-			hangup(lastCallId);
-		}
 	}
 	
 	/**
@@ -1015,13 +773,6 @@ public class RayoClient {
 		connection.send(iq);
 	}
 
-	public void unjoin(String from, JoinDestinationType type) throws XmppException {
-		
-		if (lastCallId != null) {
-			unjoin(from, type, lastCallId);
-		}	
-	}
-
 	public void unjoin(String from, JoinDestinationType type, String callId) throws XmppException {
 		
 		UnjoinCommand unjoin = new UnjoinCommand();
@@ -1029,13 +780,6 @@ public class RayoClient {
 		unjoin.setType(type);
 		
 		command(unjoin,callId);
-	}
-	
-	public void join(String to, String media, String direction, JoinDestinationType type) throws XmppException {
-		
-		if (lastCallId != null) {
-			join(to,media,direction,type,lastCallId);
-		}	
 	}
 
 	public void join(String to, String media, String direction, JoinDestinationType type, String callId) throws XmppException {
@@ -1049,35 +793,15 @@ public class RayoClient {
 		command(join,callId);
 	}
 	
-	public void join(JoinCommand join) throws XmppException {
-		
-		if (lastCallId != null) {
-			join(join, lastCallId);
-		}
-	}
-	
 	public void join(JoinCommand join, String callId) throws XmppException {
 		
 		command(join,callId);
-	}
-	
-	public void dtmf(String tones) throws XmppException {
-		
-		DtmfCommand dtmf = new DtmfCommand(tones);
-		command(dtmf);
 	}
 	
 	public void dtmf(String tones, String callId) throws XmppException {
 		
 		DtmfCommand dtmf = new DtmfCommand(tones);
 		command(dtmf, callId);
-	}
-	
-	public void command(CallCommand command) throws XmppException {
-
-		if (lastCallId != null) {
-			command(command, lastCallId);
-		}
 	}
 	
 	public void command(CallCommand command, String callId) throws XmppException {
@@ -1096,11 +820,6 @@ public class RayoClient {
             .setChild(Extension.create(command));
         VerbRef ref = sendAndGetRef(null, iq);
         return ref;
-	}
-	
-	public String getLastCallId() {
-		
-		return lastCallId;
 	}
 	
 	private String buildFrom() {

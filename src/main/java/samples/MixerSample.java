@@ -18,15 +18,13 @@ public class MixerSample extends BaseSample {
 		
 		connect("localhost", "userc", "1");
 		
-		client.waitFor("offer");
-		String firstCall = client.getLastCallId();
+		String firstCall = client.waitForOffer().getCallId();
 		client.answer(firstCall);
-		client.say("We are goint to create a conference and then say something to it");
+		client.say("We are goint to create a conference and then say something to it", firstCall);
 		Conference conference = buildConference();
 		client.conference(conference, firstCall);
 		
-		client.waitFor("offer");
-		String secondCall = client.getLastCallId();
+		String secondCall = client.waitForOffer().getCallId();
 		client.answer(secondCall);
 
 		JoinCommand join = buildJoinCommand(conference.getRoomName());
@@ -34,7 +32,8 @@ public class MixerSample extends BaseSample {
 		
 		client.say("Oh my god, we are speaking to the conference.Oh my god, we are speaking to the conference.Oh my god, we are speaking to the conference.Oh my god, we are speaking to the conference.", conference.getRoomName());
 		Thread.sleep(10000);
-		client.hangup();
+		client.hangup(firstCall);
+		client.hangup(secondCall);
 	}
 	
 	private JoinCommand buildJoinCommand(String conferenceName) {

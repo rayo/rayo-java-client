@@ -7,12 +7,11 @@ public class AnswerSample extends BaseSample {
 
 		// Two answers should be NOOP
 		
-		client.waitFor("offer");
-		client.answer();
-		client.answer();
+		String callId = client.waitForOffer().getCallId();
+		client.answer(callId);
 
 		Thread.sleep(500000);
-		client.hangup();
+		client.hangup(callId);
 	}
 	
 	public static void main(String[] args) throws Exception {

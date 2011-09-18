@@ -11,7 +11,7 @@ public class DialTest extends XmppIntegrationTest {
 	@Test
 	public void testDialUri() throws Exception {
 		
-		rayo.answer();
+		rayo.answer(lastCallId);
 		rayo.dial(new URI("tel:123456789"));
 		
 		Thread.sleep(400);
@@ -21,7 +21,7 @@ public class DialTest extends XmppIntegrationTest {
 	@Test
 	public void testDialText() throws Exception {
 		
-		rayo.answer();
+		rayo.answer(lastCallId);
 		rayo.dial("tel:123456789");
 		
 		Thread.sleep(400);

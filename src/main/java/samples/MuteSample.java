@@ -5,19 +5,19 @@ public class MuteSample extends BaseSample {
 
 	public void run() throws Exception {
 		
-		client.waitFor("offer");
-		client.answer();
-		client.say("Muting the call");
+		String callId = client.waitForOffer().getCallId();
+		client.answer(callId);
+		client.say("Muting the call", callId);
 		Thread.sleep(5000);
-		client.mute();
+		client.mute(callId);
 		Thread.sleep(3000);
-		client.say("Whats app!!");
+		client.say("Whats app!!", callId);
 		Thread.sleep(5000);
-		client.unmute();
+		client.unmute(callId);
 		Thread.sleep(3000);
-		client.say("We are back to normal");
+		client.say("We are back to normal", callId);
 		Thread.sleep(5000);
-		client.hangup();
+		client.hangup(callId);
 		System.out.println("Wait for complete");
 		Thread.sleep(2000);
 	}

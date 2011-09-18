@@ -5,11 +5,11 @@ public class TextSaySample extends BaseSample {
 
 	public void run() throws Exception {
 		
-		client.waitFor("offer");
-		client.answer();
-		client.say("Hello World. This is a test on Rayo. I hope you heard this message. Bye bye.");
+		String callId = client.waitForOffer().getCallId();
+		client.answer(callId);
+		client.say("Hello World. This is a test on Rayo. I hope you heard this message. Bye bye.", callId);
 		Thread.sleep(15000);
-		client.hangup();
+		client.hangup(callId);
 	}
 	
 	public static void main(String[] args) throws Exception {

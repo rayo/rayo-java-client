@@ -5,11 +5,11 @@ public class DtmfSample1 extends BaseSample {
 
 	public void run() throws Exception {
 		
-		client.waitFor("offer");
-		client.answer();
-		client.dtmf("1");
+		String callId = client.waitForOffer().getCallId();
+		client.answer(callId);
+		client.dtmf("1", callId);
 		Thread.sleep(5000);
-		client.hangup();
+		client.hangup(callId);
 	}
 	
 	public static void main(String[] args) throws Exception {

@@ -12,17 +12,17 @@ public class ConferenceSample extends BaseSample {
 
 	public void run(Conference conference) throws Exception {
 		
-		client.waitFor("offer");
-		client.answer();
-		client.command(conference);
-		//Record record = new Record();
-		//VerbRef ref = client.record(record, conference.getRoomName());
-		//client.stop(ref);
+		String callId = client.waitForOffer().getCallId();
+		client.answer(callId);
+		client.command(conference, callId);
+		Record record = new Record();
+		VerbRef ref = client.record(record, conference.getRoomName());
+		client.stop(ref);
 		Thread.sleep(10000);		
-		client.hangup();
+		client.hangup(callId);
 		
 		Thread.sleep(1000);
-		client.hangup();
+		client.hangup(callId);
 		//client.say("Thank you");
 
 	}

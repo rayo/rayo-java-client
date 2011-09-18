@@ -6,13 +6,13 @@ public class TransferSample extends BaseSample {
 
 	public void run() throws Exception {
 		
-		client.waitFor("offer");
-		client.answer();
+		String callId = client.waitForOffer().getCallId();
+		client.answer(callId);
 		// Feel free to configure with your prefered sip phone
-		client.transfer(new URI("sip:mperez@127.0.0.1:3060"));
+		client.transfer(new URI("sip:mperez@127.0.0.1:3060"), callId);
 		//client.transfer(new URI("sip:192.168.1.34:5060"));
 		Thread.sleep(60000);
-		client.hangup();
+		client.hangup(callId);
 	}
 	
 	public static void main(String[] args) throws Exception {

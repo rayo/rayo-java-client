@@ -12,18 +12,18 @@ public class JoinSample2 extends BaseSample {
 		
 		connect("192.168.1.34", "usera", "1");
 		
-		client.waitFor("offer");
-		client.answer();
+		String callId = client.waitForOffer().getCallId();
+		client.answer(callId);
 		Thread.sleep(3000);
 		//dial and get a call ref
 		VerbRef result = client.dial(new URI("sip:usera@192.168.1.34:5060"), new URI("sip:mpermar@iptel.org"));
 		client.waitFor("answered");
 		Thread.sleep(3000);
-		client.join(result.getVerbId(), "direct", "duplex", JoinDestinationType.CALL);
+		client.join(result.getVerbId(), "direct", "duplex", JoinDestinationType.CALL, callId);
 		Thread.sleep(10000);
 		Thread.sleep(3000);
-		client.unjoin(result.getVerbId(), JoinDestinationType.CALL);
-		client.hangup();
+		client.unjoin(result.getVerbId(), JoinDestinationType.CALL, callId);
+		client.hangup(callId);
 	}
 		
 	public static void main(String[] args) throws Exception {

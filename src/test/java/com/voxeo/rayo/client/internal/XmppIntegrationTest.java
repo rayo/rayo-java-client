@@ -4,13 +4,17 @@ import org.junit.After;
 import org.junit.Before;
 
 import com.voxeo.rayo.client.RayoClient;
+import com.voxeo.rayo.client.listener.RayoMessageListener;
 import com.voxeo.rayo.client.test.config.TestConfig;
+import com.voxeo.servlet.xmpp.rayo.stanza.Stanza;
 
 public abstract class XmppIntegrationTest {
 
 	protected RayoClient rayo;
 	private String username = "userc";
 	private NettyServer server;
+	
+	protected String lastCallId;
 		
 	@Before
 	public void setUp() throws Exception {
@@ -20,6 +24,17 @@ public abstract class XmppIntegrationTest {
 		rayo = new RayoClient(TestConfig.serverEndpoint, TestConfig.port);
 		login(username, "1", "voxeo");
 		
+		rayo.addStanzaListener(new RayoMessageListener("offer") {
+			
+			@Override
+			@SuppressWarnings("rawtypes")
+			public void messageReceived(Object object) {
+				
+				Stanza stanza = (Stanza)object;
+				lastCallId = stanza.getFrom().substring(0, stanza.getFrom().indexOf('@'));
+			}
+		});
+		
 		server.sendRayoOffer();
 		// Let the offer come back and be caught by the RayoClient's listener
 		Thread.sleep(100);
@@ -27,7 +42,7 @@ public abstract class XmppIntegrationTest {
 		
 	public void assertServerReceived(String message) {
 		
-		message = message.replaceAll("#callId", rayo.getLastCallId());
+		message = message.replaceAll("#callId", lastCallId);
 		server.assertReceived(message);
 	}
 	

@@ -6,15 +6,15 @@ public class AskSample extends BaseSample {
 
 	public void run() throws Exception {
 		
-		client.waitFor("offer");
-		client.answer();
-		client.ask("Welcome to Orlando Bank. Please enter your five digits number.","[4-5 DIGITS]");
+		String callId = client.waitForOffer().getCallId();
+		client.answer(callId);
+		client.ask("Welcome to Orlando Bank. Please enter your five digits number.", "[4-5 DIGITS]", callId);
 		
 		AskCompleteEvent complete = (AskCompleteEvent)client.waitFor("complete");
 		System.out.println("Success: " + complete.isSuccess());
 
 		Thread.sleep(500000);
-		client.hangup();
+		client.hangup(callId);
 	}
 	
 	public static void main(String[] args) throws Exception {

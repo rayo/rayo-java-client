@@ -6,14 +6,14 @@ public class RecordSample extends BaseSample {
 
 	public void run() throws Exception {
 		
-		client.waitFor("offer");
-		client.answer();
+		String callId = client.waitForOffer().getCallId();
+		client.answer(callId);
 		Record record = new Record();
 		//record.setMaxDuration(new Duration(2000));
 		record.setFormat("mp3");
-		client.record(record);
+		client.record(record, callId);
 		Thread.sleep(10000);
-		client.hangup();
+		client.hangup(callId);
 		System.out.println("Wait for complete");
 		Thread.sleep(2000);
 	}

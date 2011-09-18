@@ -12,8 +12,8 @@ public class SayTest extends XmppIntegrationTest {
 	@Test
 	public void testTextSay() throws Exception {
 		
-		rayo.answer();
-		rayo.say("hello!");
+		rayo.answer(lastCallId);
+		rayo.say("hello!",lastCallId);
 		
 		Thread.sleep(400);
 		assertServerReceived("<iq id=\"*\" type=\"set\" from=\"userc@localhost/voxeo\" to=\"#callId@localhost\"><say xmlns=\"urn:xmpp:tropo:say:1\">hello!</say></iq>");
@@ -22,8 +22,8 @@ public class SayTest extends XmppIntegrationTest {
 	@Test
 	public void testAudioSay() throws Exception {
 		
-		rayo.answer();
-		rayo.sayAudio("http://ccmixter.org/content/DoKashiteru/DoKashiteru_-_you_(na-na-na-na).mp3");
+		rayo.answer(lastCallId);
+		rayo.sayAudio("http://ccmixter.org/content/DoKashiteru/DoKashiteru_-_you_(na-na-na-na).mp3",lastCallId);
 		
 		Thread.sleep(400);
 		assertServerReceived("<iq id=\"*\" type=\"set\" from=\"userc@localhost/voxeo\" to=\"#callId@localhost\"><say xmlns=\"urn:xmpp:tropo:say:1\"><audio xmlns=\"\" src=\"http://ccmixter.org/content/DoKashiteru/DoKashiteru_-_you_(na-na-na-na).mp3\"></audio></say></iq>");
@@ -32,8 +32,8 @@ public class SayTest extends XmppIntegrationTest {
 	@Test
 	public void testAudioSayUri() throws Exception {
 		
-		rayo.answer();
-		rayo.say(new URI("http://ccmixter.org/content/DoKashiteru/DoKashiteru_-_you_(na-na-na-na).mp3"));
+		rayo.answer(lastCallId);
+		rayo.say(new URI("http://ccmixter.org/content/DoKashiteru/DoKashiteru_-_you_(na-na-na-na).mp3"),lastCallId);
 		
 		Thread.sleep(400);
 		assertServerReceived("<iq id=\"*\" type=\"set\" from=\"userc@localhost/voxeo\" to=\"#callId@localhost\"><say xmlns=\"urn:xmpp:tropo:say:1\"><audio xmlns=\"\" src=\"http://ccmixter.org/content/DoKashiteru/DoKashiteru_-_you_(na-na-na-na).mp3\"></audio></say></iq>");
@@ -42,8 +42,8 @@ public class SayTest extends XmppIntegrationTest {
 	@Test
 	public void testStop() throws Exception {
 		
-		rayo.answer();
-		VerbRef say = rayo.say(new URI("http://ccmixter.org/content/DoKashiteru/DoKashiteru_-_you_(na-na-na-na).mp3"));
+		rayo.answer(lastCallId);
+		VerbRef say = rayo.say(new URI("http://ccmixter.org/content/DoKashiteru/DoKashiteru_-_you_(na-na-na-na).mp3"),lastCallId);
 		rayo.stop(say);
 		
 		String toJid = say.getCallId()+"@"+rayo.getXmppConnection().getServiceName()+"/"+say.getVerbId();
@@ -54,8 +54,8 @@ public class SayTest extends XmppIntegrationTest {
 	@Test
 	public void testResume() throws Exception {
 		
-		rayo.answer();
-		VerbRef say = rayo.say(new URI("http://ccmixter.org/content/DoKashiteru/DoKashiteru_-_you_(na-na-na-na).mp3"));
+		rayo.answer(lastCallId);
+		VerbRef say = rayo.say(new URI("http://ccmixter.org/content/DoKashiteru/DoKashiteru_-_you_(na-na-na-na).mp3"),lastCallId);
 		rayo.resume(say);
 		
 		String toJid = say.getCallId()+"@"+rayo.getXmppConnection().getServiceName()+"/"+say.getVerbId();
@@ -66,8 +66,8 @@ public class SayTest extends XmppIntegrationTest {
 	@Test
 	public void testPause() throws Exception {
 		
-		rayo.answer();
-		VerbRef say = rayo.say(new URI("http://ccmixter.org/content/DoKashiteru/DoKashiteru_-_you_(na-na-na-na).mp3"));
+		rayo.answer(lastCallId);
+		VerbRef say = rayo.say(new URI("http://ccmixter.org/content/DoKashiteru/DoKashiteru_-_you_(na-na-na-na).mp3"),lastCallId);
 		rayo.pause(say);
 		
 		String toJid = say.getCallId()+"@"+rayo.getXmppConnection().getServiceName()+"/"+say.getVerbId();

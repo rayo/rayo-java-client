@@ -12,20 +12,20 @@ public class JoinSample1 extends BaseSample {
 		
 		connect("localhost", "user100", "1");
 		
-		client.waitFor("offer");
-		client.answer();
+		String callId = client.waitForOffer().getCallId();
+		client.answer(callId);
 		Thread.sleep(3000);
 		//dial and get a call ref
 		VerbRef result = client.dial(new URI("sip:userc@127.0.0.1:5060"), new URI("sip:mperez@127.0.0.1:3060"));
 		client.waitFor("answered");
 		Thread.sleep(3000);
-		client.join(result.getVerbId(), "direct", "duplex", JoinDestinationType.CALL);
+		client.join(result.getVerbId(), "direct", "duplex", JoinDestinationType.CALL, callId);
 		Thread.sleep(3000);
-		client.unjoin(result.getVerbId(), JoinDestinationType.CALL);
+		client.unjoin(result.getVerbId(), JoinDestinationType.CALL, callId);
 		Thread.sleep(6000);
-		client.say("now you can talk");
+		client.say("now you can talk", callId);
 		Thread.sleep(10000);
-		client.hangup();
+		client.hangup(callId);
 	}
 		
 	public static void main(String[] args) throws Exception {

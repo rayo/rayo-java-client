@@ -14,7 +14,7 @@ public class DialSample extends BaseSample {
 		client.say("hello. how are you", dialRef.getVerbId());
 		
 		Thread.sleep(5000);
-		client.hangup();
+		client.hangup(dialRef.getCallId());
 	}
 		
 	public static void main(String[] args) throws Exception {

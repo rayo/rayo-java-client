@@ -4,10 +4,10 @@ public class DialSample4a extends BaseSample {
 
 	public void run() throws Exception {
 				
-		client.waitFor("offer");
-		client.answer();
-		client.say("Thank you for calling. I'm going now to hang up");
-		client.hangup();
+		String callId = client.waitForOffer().getCallId();
+		client.answer(callId);
+		client.say("Thank you for calling. I'm going now to hang up" ,callId);
+		client.hangup(callId);
 		Thread.sleep(100);
 	}
 		

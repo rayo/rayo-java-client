@@ -8,10 +8,10 @@ public class PlaybackSample extends BaseSample {
 
 	public void run() throws Exception {
 		
-		client.waitFor("offer");
-		client.answer();
+		String callId = client.waitForOffer().getCallId();
+		client.answer(callId);
 
-		VerbRef say = client.say(new URI("http://ccmixter.org/content/DoKashiteru/DoKashiteru_-_you_(na-na-na-na).mp3"));
+		VerbRef say = client.say(new URI("http://ccmixter.org/content/DoKashiteru/DoKashiteru_-_you_(na-na-na-na).mp3"), callId);
 		Thread.sleep(10000);
 		client.pause(say);
 		Thread.sleep(10000);
@@ -20,7 +20,7 @@ public class PlaybackSample extends BaseSample {
 		client.stop(say);
 		Thread.sleep(10000);		
 
-		client.hangup();
+		client.hangup(callId);
 	}
 		
 	public static void main(String[] args) throws Exception {

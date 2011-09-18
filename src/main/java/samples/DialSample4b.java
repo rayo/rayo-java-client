@@ -26,7 +26,7 @@ public class DialSample4b extends BaseSample {
 		
 		VerbRef dialRef = client.dial(dial);
 		Thread.sleep(6000);
-		client.hangup();
+		client.hangup(dialRef.getCallId());
 	}
 		
 	public static void main(String[] args) throws Exception {

@@ -16,19 +16,18 @@ public class DialSample5 extends BaseSample {
 
 	public void run() throws Exception {
 		
-		client.waitFor("offer");
-		client.answer();
-		String callId = client.getLastCallId();
+		String callId = client.waitForOffer().getCallId();
+		client.answer(callId);
 		
 		VerbRef dial1Ref = dial(callId, "sip:mperez@127.0.0.1:3060", JoinType.BRIDGE, callId);
 		VerbRef dial2Ref = dial(callId, "sip:mperez@127.0.0.1:3060", JoinType.BRIDGE, callId);
 		client.hangup(dial2Ref.getVerbId());
 		
 		Thread.sleep(6000);
-		client.unjoin(dial1Ref.getVerbId(), JoinDestinationType.CALL);
+		client.unjoin(dial1Ref.getVerbId(), JoinDestinationType.CALL, callId);
 		//client.unjoin(dial2Ref.getVerbId(), JoinDestinationType.CALL);
 		Thread.sleep(6000);
-		client.hangup();
+		client.hangup(callId);
 	}
 
 	private VerbRef dial(String callId, String endpoint, JoinType type, String id) throws URISyntaxException,XmppException {

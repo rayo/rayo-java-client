@@ -11,9 +11,7 @@ import com.rayo.core.verb.Choices;
 import com.rayo.core.verb.InputMode;
 import com.rayo.core.verb.Ssml;
 
-public class AskSample2 extends BaseSample {
-
-	private String grammar = "<grammar>";
+public class AskSample3 extends BaseSample {
 	
 	public void run() throws Exception {
 		
@@ -27,13 +25,13 @@ public class AskSample2 extends BaseSample {
 
 		List<Choices> list = new ArrayList<Choices>();
 		Choices choices = new Choices();
-		choices.setContent(grammar);
-		choices.setContentType("application/grammar+grxml");
+		choices.setContent("[5 DIGITS]");
+		choices.setContentType("application/grammar+voxeo");
 		list.add(choices);
 		ask.setChoices(list);
-		ask.setTerminator('#');
+		ask.setRecognizer("it-it");
 		ask.setMode(InputMode.DTMF);
-		ask.setTimeout(new Duration(650000));		
+		ask.setTimeout(new Duration(30));		
 		
 		client.command(ask, callId);
 		
@@ -46,8 +44,8 @@ public class AskSample2 extends BaseSample {
 	
 	public static void main(String[] args) throws Exception {
 		
-		AskSample2 sample = new AskSample2();
-		sample.connect("localhost", "userc", "1");
+		AskSample3 sample = new AskSample3();
+		sample.connect("localhost", "usera", "1");
 		sample.run();
 		sample.shutdown();
 	}

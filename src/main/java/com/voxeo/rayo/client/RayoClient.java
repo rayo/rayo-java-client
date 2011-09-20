@@ -43,9 +43,11 @@ import com.rayo.core.verb.VerbRef;
 import com.voxeo.moho.Participant.JoinType;
 import com.voxeo.rayo.client.auth.AuthenticationListener;
 import com.voxeo.rayo.client.filter.XmppObjectFilter;
+import com.voxeo.rayo.client.listener.RayoMessageListener;
 import com.voxeo.rayo.client.listener.StanzaListener;
 import com.voxeo.servlet.xmpp.rayo.extensions.Extension;
 import com.voxeo.servlet.xmpp.rayo.stanza.IQ;
+import com.voxeo.servlet.xmpp.rayo.stanza.Stanza;
 
 /**
  * This class servers as a client to the Rayo XMPP platform.
@@ -191,7 +193,25 @@ public class RayoClient {
 	 */
 	public OfferEvent waitForOffer() throws XmppException {
 		
-		return waitFor("offer", OfferEvent.class);
+		final StringBuilder callId = new StringBuilder();
+		addStanzaListener(new RayoMessageListener("offer") {
+			
+			@Override
+			@SuppressWarnings("rawtypes")
+			public void messageReceived(Object object) {
+				
+				Stanza stanza = (Stanza)object;
+				callId.append(stanza.getFrom().substring(0, stanza.getFrom().indexOf('@')));
+			}
+		});
+		OfferEvent stanza = waitFor("offer", OfferEvent.class);
+		
+		OfferEvent offer = new OfferEvent(callId.toString());
+		offer.setTo(stanza.getTo());
+		offer.setFrom(stanza.getFrom());
+		offer.setHeaders(stanza.getHeaders());
+		
+		return offer;
 	}
 	
 	/**

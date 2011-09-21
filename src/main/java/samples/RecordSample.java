@@ -21,7 +21,7 @@ public class RecordSample extends BaseSample {
 	public static void main(String[] args) throws Exception {
 		
 		RecordSample sample = new RecordSample();
-		sample.connect("localhost", "userc", "1");
+		sample.connect("localhost", "usera", "1");
 		sample.run();
 		sample.shutdown();
 	}

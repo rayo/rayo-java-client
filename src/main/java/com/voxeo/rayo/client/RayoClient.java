@@ -9,6 +9,7 @@ import javax.media.mscontrol.join.Joinable;
 
 import org.joda.time.Duration;
 
+import com.rayo.core.AcceptCommand;
 import com.rayo.core.AnswerCommand;
 import com.rayo.core.CallCommand;
 import com.rayo.core.CallRejectReason;
@@ -319,11 +320,11 @@ public class RayoClient {
 	 */
 	public void accept(String callId) throws XmppException {
 		
-		AnswerCommand answer = new AnswerCommand();
+		AcceptCommand accept = new AcceptCommand();
 		IQ iq = new IQ(IQ.Type.set)
 			.setFrom(buildFrom())
 			.setTo(buildTo(callId))
-			.setChild(Extension.create(answer));
+			.setChild(Extension.create(accept));
 		connection.send(iq);		
 	}	
 	

@@ -339,6 +339,20 @@ public class RayoClient {
 		reject(CallRejectReason.DECLINE, callId);
 	}
 	
+	
+	/**
+	 * Rejects a call id
+	 * 
+	 * @param reject Reject command
+	 * @param callId Id of the call
+	 * 
+	 * @throws XmppException If there is any issue while rejecting the call
+	 */
+	public void reject(RejectCommand reject, String callId) throws XmppException {
+
+		command(reject, callId);
+	}
+	
 	/**
 	 * Rejects the call with the id specified as a parameter. 
 	 * 
@@ -853,7 +867,19 @@ public class RayoClient {
 		
 		RedirectCommand redirect = new RedirectCommand();
 		redirect.setTo(uri);
-		command(redirect, callId);
+		redirect(redirect, callId);
+	}
+	
+	
+	/**
+	 * Redirects an existing call
+	 * 
+	 * @param command Redirect command
+	 * @param callId Id of the call to redirect
+	 */
+	public void redirect(RedirectCommand command, String callId) throws XmppException {
+		
+		command(command, callId);
 	}
 	
 	private String buildFrom() {

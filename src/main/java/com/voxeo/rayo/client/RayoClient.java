@@ -18,6 +18,7 @@ import com.rayo.core.HangupCommand;
 import com.rayo.core.JoinCommand;
 import com.rayo.core.JoinDestinationType;
 import com.rayo.core.OfferEvent;
+import com.rayo.core.RedirectCommand;
 import com.rayo.core.RejectCommand;
 import com.rayo.core.UnjoinCommand;
 import com.rayo.core.verb.Ask;
@@ -840,6 +841,19 @@ public class RayoClient {
             .setChild(Extension.create(command));
         VerbRef ref = sendAndGetRef(null, iq);
         return ref;
+	}
+	
+	/**
+	 * Redirects an existing call to the given URI
+	 * 
+	 * @param uri URI for redirecting the call to
+	 * @param callId Id of the call to redirect
+	 */
+	public void redirect(URI uri, String callId) throws XmppException {
+		
+		RedirectCommand redirect = new RedirectCommand();
+		redirect.setTo(uri);
+		command(redirect, callId);
 	}
 	
 	private String buildFrom() {

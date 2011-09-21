@@ -10,19 +10,6 @@
 		<spring.version>3.0.5.RELEASE</spring.version>
 	</properties>
 
-	<repositories>
-		<repository>
-			<id>voxeo-public</id>
-			<name>Uncle Voxeo's Public Maven Repo</name>
-			<url>http://maven.voxeo.net/nexus/content/groups/public</url>
-		</repository>
-		<repository>
-			<id>glassfish-maven-repository'</id>
-			<name>Glassfish Maven Repository</name>
-			<url>http://maven.glassfish.org/content/repositories/maven.hudson-labs.org</url>
-		</repository>
-	</repositories>
-
 	<dependencies>
 		<!-- Rayo Stuff -->
 		<dependency>
@@ -116,5 +103,15 @@
 				<enabled>true</enabled>
 			</releases>
 		</repository>
+		<repository>
+			<id>voxeo-public</id>
+			<name>Uncle Voxeo's Public Maven Repo</name>
+			<url>http://maven.voxeo.net/nexus/content/groups/public</url>
+		</repository>
+		<repository>
+			<id>glassfish-maven-repository'</id>
+			<name>Glassfish Maven Repository</name>
+			<url>http://maven.glassfish.org/content/repositories/maven.hudson-labs.org</url>
+		</repository>		
 	</repositories>
 </project>

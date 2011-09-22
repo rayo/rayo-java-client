@@ -149,6 +149,15 @@ public class IQ extends Stanza<IQ> {
 		return XmppObjectSupport.newChildInstance(Query.class, this, "query");
 	}
 	
+	public boolean isError() {
+		
+		return getType() == Type.error;
+	}
+	
+	public boolean isResult() {
+		
+		return getType() == Type.result;
+	}
 	
 	
 	/**

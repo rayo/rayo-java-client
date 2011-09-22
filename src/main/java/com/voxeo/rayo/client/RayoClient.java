@@ -36,12 +36,16 @@ import com.rayo.core.verb.RecordPauseCommand;
 import com.rayo.core.verb.RecordResumeCommand;
 import com.rayo.core.verb.RefEvent;
 import com.rayo.core.verb.Say;
+import com.rayo.core.verb.SpeedDownCommand;
+import com.rayo.core.verb.SpeedUpCommand;
 import com.rayo.core.verb.Ssml;
 import com.rayo.core.verb.StopCommand;
 import com.rayo.core.verb.Transfer;
 import com.rayo.core.verb.UnholdCommand;
 import com.rayo.core.verb.UnmuteCommand;
 import com.rayo.core.verb.VerbRef;
+import com.rayo.core.verb.VolumeDownCommand;
+import com.rayo.core.verb.VolumeUpCommand;
 import com.voxeo.moho.Participant.JoinType;
 import com.voxeo.rayo.client.auth.AuthenticationListener;
 import com.voxeo.rayo.client.filter.XmppObjectFilter;
@@ -59,7 +63,7 @@ import com.voxeo.servlet.xmpp.rayo.stanza.Stanza;
  */
 public class RayoClient {
 
-	private final XmppConnection connection;
+	protected final XmppConnection connection;
 	private static final String DEFAULT_RESOURCE = "voxeo";
 
 	/**
@@ -299,45 +303,48 @@ public class RayoClient {
 	 * 
 	 * @param callId Id of the call that will be answered
 	 * 
+	 * @return IQ Resulting IQ
+	 * 
 	 * @throws XmppException If there is any issue while answering the call
 	 */
-	public void answer(String callId) throws XmppException {
+	public IQ answer(String callId) throws XmppException {
 		
 		AnswerCommand answer = new AnswerCommand();
 		IQ iq = new IQ(IQ.Type.set)
 			.setFrom(buildFrom())
 			.setTo(buildTo(callId))
 			.setChild(Extension.create(answer));
-		connection.send(iq);		
+		return sendIQ(iq);		
 	}
 	
 	/**
 	 * Accepts the call with the id specified as a parameter. 
 	 * 
 	 * @param callId Id of the call that will be accepted
-	 * 
+	 * @return IQ Resulting IQ
 	 * @throws XmppException If there is any issue while accepting the call
 	 */
-	public void accept(String callId) throws XmppException {
+	public IQ accept(String callId) throws XmppException {
 		
 		AcceptCommand accept = new AcceptCommand();
 		IQ iq = new IQ(IQ.Type.set)
 			.setFrom(buildFrom())
 			.setTo(buildTo(callId))
 			.setChild(Extension.create(accept));
-		connection.send(iq);		
+		return sendIQ(iq);		
 	}	
 	
 	/**
 	 * Rejects the latest call that this connection has received from the Rayo server
 	 * 
 	 * @param callId Id of the call
+	 * @return IQ Resulting IQ
 	 * 
 	 * @throws XmppException If there is any issue while rejecting the call
 	 */
-	public void reject(String callId) throws XmppException {
+	public IQ reject(String callId) throws XmppException {
 
-		reject(CallRejectReason.DECLINE, callId);
+		return reject(CallRejectReason.DECLINE, callId);
 	}
 	
 	
@@ -346,29 +353,31 @@ public class RayoClient {
 	 * 
 	 * @param reject Reject command
 	 * @param callId Id of the call
+	 * @return IQ Resulting IQ
 	 * 
 	 * @throws XmppException If there is any issue while rejecting the call
 	 */
-	public void reject(RejectCommand reject, String callId) throws XmppException {
+	public IQ reject(RejectCommand reject, String callId) throws XmppException {
 
-		command(reject, callId);
+		return command(reject, callId);
 	}
 	
 	/**
 	 * Rejects the call with the id specified as a parameter. 
 	 * 
 	 * @param callId Id of the call that will be accepted
+	 * @return IQ Resulting IQ
 	 * 
 	 * @throws XmppException If there is any issue while rejecting the call
 	 */
-	public void reject(CallRejectReason reason, String callId) throws XmppException {
+	public IQ reject(CallRejectReason reason, String callId) throws XmppException {
 		
 		RejectCommand reject = new RejectCommand(callId, reason);
 		IQ iq = new IQ(IQ.Type.set)
 			.setFrom(buildFrom())
 			.setTo(buildTo(callId))
 			.setChild(Extension.create(reject));
-		connection.send(iq);		
+		return sendIQ(iq);		
 	}	
 
 	public VerbRef outputSsml(String ssml, String callId) throws XmppException {
@@ -450,14 +459,14 @@ public class RayoClient {
 	 * 
 	 * @param to URI where the call will be transfered
 	 * @param callId Id of the call we want to transfer
-	 * 
+	 * @return IQ Resulting IQ
 	 * @throws XmppException If there is any issue while transfering the call
 	 */
-	public void transfer(URI to, String callId) throws XmppException {
+	public IQ transfer(URI to, String callId) throws XmppException {
 
 		List<URI> list = new ArrayList<URI>();
 		list.add(to);
-		transfer(null, list, callId);
+		return transfer(null, list, callId);
 	}
 	
 
@@ -466,18 +475,18 @@ public class RayoClient {
 	 * 
 	 * @param to URI where the call will be transfered
 	 * @param callId Id of the call we want to transfer
-	 * 
+	 * @return IQ Resulting IQ
 	 * @throws XmppException If there is any issue while transfering the call
 	 * @throws URISyntaxException If an invalid URI is passed as a parameter
 	 */
-	public void transfer(String to, String callId) throws XmppException, URISyntaxException {
+	public IQ transfer(String to, String callId) throws XmppException, URISyntaxException {
 
-		transfer(new URI(to), callId);
+		return transfer(new URI(to), callId);
 	}
 
-	public void transfer(List<URI> to, String callId) throws XmppException {
+	public IQ transfer(List<URI> to, String callId) throws XmppException {
 
-		transfer(null, to, callId);
+		return transfer(null, to, callId);
 	}
 	
 	/**
@@ -486,10 +495,10 @@ public class RayoClient {
 	 * @param text Text that will be prompted to the user
 	 * @param to URI of the call destination
 	 * @param callId Id of the call that we want to transfer
-	 * 
+	 * @return IQ Resulting IQ
 	 * @throws XmppException If there is any issue while transfering the call
 	 */
-	public void transfer(String text, List<URI> to, String callId) throws XmppException {
+	public IQ transfer(String text, List<URI> to, String callId) throws XmppException {
 
 		Transfer transfer = new Transfer();
 		transfer.setTimeout(new Duration(20000));
@@ -505,31 +514,31 @@ public class RayoClient {
 			.setFrom(buildFrom())
 			.setTo(buildTo(callId))
 			.setChild(Extension.create(transfer));
-		connection.send(iq);
+		return sendIQ(iq);
 	}
 	
-	public void hold(String callId) throws XmppException {
+	public IQ hold(String callId) throws XmppException {
 
 		HoldCommand hold = new HoldCommand();
-		command(hold,callId);
+		return command(hold,callId);
 	}
 	
-	public void unhold(String callId) throws XmppException {
+	public IQ unhold(String callId) throws XmppException {
 
 		UnholdCommand unhold = new UnholdCommand();
-		command(unhold,callId);
+		return command(unhold,callId);
 	}
 	
-	public void mute(String callId) throws XmppException {
+	public IQ mute(String callId) throws XmppException {
 
 		MuteCommand mute = new MuteCommand();
-		command(mute,callId);
+		return command(mute,callId);
 	}
 	
-	public void unmute(String callId) throws XmppException {
+	public IQ unmute(String callId) throws XmppException {
 
 		UnmuteCommand unmute = new UnmuteCommand();
-		command(unmute,callId);
+		return command(unmute,callId);
 	}	
 	/**
 	 * Calls a specific destination
@@ -606,10 +615,10 @@ public class RayoClient {
 	 * @param text Text that will be prompted
 	 * @param choicesText Choices
 	 * @param callId Id of the call in which the question will be asked
-	 * 
+	 * @return IQ Resulting IQ
 	 * @throws XmppException If there is any issue while asking the question 
 	 */
-	public void ask(String text, String choicesText, String callId) throws XmppException {
+	public IQ ask(String text, String choicesText, String callId) throws XmppException {
 		
 		Ask ask = new Ask();
 
@@ -630,7 +639,7 @@ public class RayoClient {
 			.setFrom(buildFrom())
 			.setTo(buildTo(callId))
 			.setChild(Extension.create(ask));
-		connection.send(iq);
+		return sendIQ(iq);
 	}
 	
 	/**
@@ -706,46 +715,112 @@ public class RayoClient {
 	 * Pauses a verb component
 	 * 
 	 * @param ref Verb component that we want to pause
+	 * @return IQ Resulting IQ
 	 */
-	public void pause(VerbRef ref) throws XmppException {
+	public IQ pause(VerbRef ref) throws XmppException {
 		
 		ClientPauseCommand pause = new ClientPauseCommand();
 		IQ iq = new IQ(IQ.Type.set)
 			.setFrom(buildFrom())
 			.setTo(buildTo(ref.getCallId(),ref.getVerbId()))
 			.setChild(Extension.create(pause));
-		connection.send(iq);
+		return sendIQ(iq);
 	}
 	
 	/**
 	 * Resumes a verb component
 	 * 
 	 * @param ref Verb component that we want to resume
+	 * @return IQ Resulting IQ
 	 */
-	public void resume(VerbRef ref) throws XmppException {
+	public IQ resume(VerbRef ref) throws XmppException {
 		
 		ClientResumeCommand resume = new ClientResumeCommand();
 		IQ iq = new IQ(IQ.Type.set)
 			.setFrom(buildFrom())
 			.setTo(buildTo(ref.getCallId(),ref.getVerbId()))
 			.setChild(Extension.create(resume));
-		connection.send(iq);
+		return sendIQ(iq);
 	}
 	
+	/**
+	 * Speeds up
+	 * 
+	 * @param ref Verb component that we want to speed up
+	 * @return IQ Resulting IQ
+	 */
+	public IQ speedUp(VerbRef ref) throws XmppException {
+		
+		SpeedUpCommand speedup = new SpeedUpCommand();
+		IQ iq = new IQ(IQ.Type.set)
+			.setFrom(buildFrom())
+			.setTo(buildTo(ref.getCallId(),ref.getVerbId()))
+			.setChild(Extension.create(speedup));
+		return sendIQ(iq);
+	}
+	
+	/**
+	 * Speeds down
+	 * 
+	 * @param ref Verb component that we want to speed up
+	 * @return IQ Resulting IQ
+	 */
+	public IQ speedDown(VerbRef ref) throws XmppException {
+		
+		SpeedDownCommand speedDown = new SpeedDownCommand();
+		IQ iq = new IQ(IQ.Type.set)
+			.setFrom(buildFrom())
+			.setTo(buildTo(ref.getCallId(),ref.getVerbId()))
+			.setChild(Extension.create(speedDown));
+		return sendIQ(iq);
+	}
+	
+	
+	/**
+	 * Turn volume up
+	 * 
+	 * @param ref Verb component that we want to turn volume up
+	 * @return IQ Resulting IQ
+	 */
+	public IQ volumeUp(VerbRef ref) throws XmppException {
+		
+		VolumeUpCommand volumeUp = new VolumeUpCommand();
+		IQ iq = new IQ(IQ.Type.set)
+			.setFrom(buildFrom())
+			.setTo(buildTo(ref.getCallId(),ref.getVerbId()))
+			.setChild(Extension.create(volumeUp));
+		return sendIQ(iq);
+	}
+	
+	/**
+	 * Turn volume down
+	 * 
+	 * @param ref Verb component that we want to turn volume down
+	 * @return IQ Resulting IQ
+	 */
+	public IQ volumeDown(VerbRef ref) throws XmppException {
+		
+		VolumeDownCommand volumeDown = new VolumeDownCommand();
+		IQ iq = new IQ(IQ.Type.set)
+			.setFrom(buildFrom())
+			.setTo(buildTo(ref.getCallId(),ref.getVerbId()))
+			.setChild(Extension.create(volumeDown));
+		return sendIQ(iq);
+	}
 	
 	/**
 	 * Pauses a records component
 	 * 
 	 * @param ref Verb component that we want to pause
 	 */
-	public void pauseRecord(VerbRef ref) throws XmppException {
+	public IQ pauseRecord(VerbRef ref) throws XmppException {
 		
 		RecordPauseCommand pause = new RecordPauseCommand();
 		IQ iq = new IQ(IQ.Type.set)
 			.setFrom(buildFrom())
 			.setTo(buildTo(ref.getCallId(),ref.getVerbId()))
 			.setChild(Extension.create(pause));
-		connection.send(iq);
+		return sendIQ(iq);
 	}
 	
 	/**
@@ -753,14 +828,14 @@ public class RayoClient {
 	 * 
 	 * @param ref Verb component that we want to resume
 	 */
-	public void resumeRecord(VerbRef ref) throws XmppException {
+	public IQ resumeRecord(VerbRef ref) throws XmppException {
 		
 		RecordResumeCommand resume = new RecordResumeCommand();
 		IQ iq = new IQ(IQ.Type.set)
 			.setFrom(buildFrom())
 			.setTo(buildTo(ref.getCallId(),ref.getVerbId()))
 			.setChild(Extension.create(resume));
-		connection.send(iq);
+		return sendIQ(iq);
 	}
 	
 	/**
@@ -768,14 +843,14 @@ public class RayoClient {
 	 * 
 	 * @param ref Verb component that we want to stop
 	 */
-	public void stop(VerbRef ref) throws XmppException {
+	public IQ stop(VerbRef ref) throws XmppException {
 		
 		StopCommand stop = new StopCommand();
 		IQ iq = new IQ(IQ.Type.set)
 			.setFrom(buildFrom())
 			.setTo(buildTo(ref.getCallId(),ref.getVerbId()))
 			.setChild(Extension.create(stop));
-		connection.send(iq);
+		return sendIQ(iq);
 	}
 	
 	public VerbRef record(String callId) throws XmppException {
@@ -797,8 +872,9 @@ public class RayoClient {
 	 * Hangs up the specified call id
 	 * 
 	 * @param callId Id of the call to be hung up
+	 * @return IQ Resulting IQ
 	 */
-	public void hangup(String callId) throws XmppException {
+	public IQ hangup(String callId) throws XmppException {
 		
 		HangupCommand hangup = new HangupCommand(null);
 		
@@ -806,19 +882,19 @@ public class RayoClient {
 			.setFrom(buildFrom())
 			.setTo(buildTo(callId))
 			.setChild(Extension.create(hangup));
-		connection.send(iq);
+		return sendIQ(iq);
 	}
 
-	public void unjoin(String from, JoinDestinationType type, String callId) throws XmppException {
+	public IQ unjoin(String from, JoinDestinationType type, String callId) throws XmppException {
 		
 		UnjoinCommand unjoin = new UnjoinCommand();
 		unjoin.setFrom(from);
 		unjoin.setType(type);
 		
-		command(unjoin,callId);
+		return command(unjoin,callId);
 	}
 
-	public void join(String to, String media, String direction, JoinDestinationType type, String callId) throws XmppException {
+	public IQ join(String to, String media, String direction, JoinDestinationType type, String callId) throws XmppException {
 		
 		JoinCommand join = new JoinCommand();
 		join.setTo(to);
@@ -826,26 +902,26 @@ public class RayoClient {
 		join.setMedia(JoinType.BRIDGE);
 		join.setType(type);
 		
-		command(join,callId);
+		return command(join,callId);
 	}
 	
-	public void join(JoinCommand join, String callId) throws XmppException {
+	public IQ join(JoinCommand join, String callId) throws XmppException {
 		
-		command(join,callId);
+		return command(join,callId);
 	}
 	
-	public void dtmf(String tones, String callId) throws XmppException {
+	public IQ dtmf(String tones, String callId) throws XmppException {
 		
 		DtmfCommand dtmf = new DtmfCommand(tones);
-		command(dtmf, callId);
+		return command(dtmf, callId);
 	}
 	
-	public void command(CallCommand command, String callId) throws XmppException {
+	public IQ command(CallCommand command, String callId) throws XmppException {
         IQ iq = new IQ(IQ.Type.set)
             .setFrom(buildFrom())
             .setTo(buildTo(callId))
             .setChild(Extension.create(command));
-        connection.send(iq);
+        return sendIQ(iq);
 	}
 	
 	public VerbRef dial(DialCommand command) throws XmppException {
@@ -864,11 +940,11 @@ public class RayoClient {
 	 * @param uri URI for redirecting the call to
 	 * @param callId Id of the call to redirect
 	 */
-	public void redirect(URI uri, String callId) throws XmppException {
+	public IQ redirect(URI uri, String callId) throws XmppException {
 		
 		RedirectCommand redirect = new RedirectCommand();
 		redirect.setTo(uri);
-		redirect(redirect, callId);
+		return redirect(redirect, callId);
 	}
 	
 	
@@ -877,10 +953,16 @@ public class RayoClient {
 	 * 
 	 * @param command Redirect command
 	 * @param callId Id of the call to redirect
+	 * @return IQ Resulting IQ
 	 */
-	public void redirect(RedirectCommand command, String callId) throws XmppException {
+	public IQ redirect(RedirectCommand command, String callId) throws XmppException {
 		
-		command(command, callId);
+		return command(command, callId);
+	}
+	
+	protected IQ sendIQ(IQ iq) throws XmppException {
+		
+		return (IQ)connection.sendAndWait(iq);
 	}
 	
 	private String buildFrom() {

@@ -32,6 +32,7 @@
 			<groupId>org.jboss.netty</groupId>
 			<artifactId>netty</artifactId>
 			<version>3.2.4.Final</version>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>
@@ -65,6 +66,7 @@
 			<groupId>net.sourceforge.htmlunit</groupId>
 			<artifactId>htmlunit</artifactId>
 			<version>2.8</version>
+			<scope>test</scope>
 		</dependency>
 
 		<!-- Jolokia -->
@@ -72,11 +74,13 @@
 			<groupId>org.jolokia</groupId>
 			<artifactId>jolokia-core</artifactId>
 			<version>0.95</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jolokia</groupId>
 			<artifactId>jolokia-client-java</artifactId>
 			<version>0.95</version>
+			<scope>test</scope>
 		</dependency>
 
 	</dependencies>

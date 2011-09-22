@@ -201,7 +201,6 @@ public class ConnectionTest {
 		Thread.sleep(500);
 		assertEquals(handler.getHandled(),1);
 		
-		// There is no response for answers
 		AnswerCommand answer = new AnswerCommand();
 		iq = new IQ(IQ.Type.set)
 			.setFrom("userc@localhost")
@@ -209,7 +208,7 @@ public class ConnectionTest {
 			.setChild(Extension.create(answer));
 		connection.send(iq,handler);
 		Thread.sleep(500);
-		assertEquals(handler.getHandled(),1);
+		assertEquals(handler.getHandled(),2);
 	}
 	
 	@After

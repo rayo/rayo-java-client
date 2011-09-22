@@ -99,6 +99,7 @@ public class NettyServerHandler extends SimpleChannelHandler {
 		IQ iq = new IQ(element);
 		storeIQ(iq);
 		
+		IQ response = null;
 		if (iq.getChildName().equals("say") || 
 			iq.getChildName().equals("conference") ||
 			iq.getChildName().equals("transfer") ||
@@ -112,9 +113,11 @@ public class NettyServerHandler extends SimpleChannelHandler {
 			RefEvent ref = new RefEvent();
 			ref.setJid(id);
 			
-			IQ response = iq.result(Extension.create(ref)); 
-			sendResponse(channel, response.toString());
+			response = iq.result(Extension.create(ref)); 
+		} else {
+			response = iq.result();
 		}
+		sendResponse(channel, response.toString());
 	}
 
     private void sendResponse(Channel channel, String response) {

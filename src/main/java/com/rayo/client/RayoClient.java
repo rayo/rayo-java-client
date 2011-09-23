@@ -664,9 +664,14 @@ public class RayoClient {
 		return sendIQ(iq);
 	}
 	
-	public IQ input(String callId, Input input) throws XmppException {
+	public VerbRef input(Input input, String callId) throws XmppException {
 		
-		return command(input, callId);
+		IQ iq = new IQ(IQ.Type.set)
+			.setFrom(buildFrom())
+			.setTo(buildTo(callId))
+			.setChild(Extension.create(input));
+		
+		return sendAndGetRef(callId, iq);
 	}
 	
 	/**

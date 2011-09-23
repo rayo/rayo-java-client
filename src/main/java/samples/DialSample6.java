@@ -3,9 +3,9 @@ package samples;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import com.rayo.client.XmppException;
 import com.rayo.core.verb.VerbRef;
 import com.rayo.core.DialCommand;
-import com.voxeo.rayo.client.XmppException;
 
 public class DialSample6 extends BaseSample {
 

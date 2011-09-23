@@ -6,13 +6,13 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.voxeo.rayo.client.SimpleXmppConnection;
-import com.voxeo.rayo.client.XmppConnection;
+import com.rayo.client.SimpleXmppConnection;
+import com.rayo.client.XmppConnection;
+import com.rayo.client.xmpp.stanza.Bind;
+import com.rayo.client.xmpp.stanza.IQ;
 import com.voxeo.rayo.client.internal.NettyServer;
 import com.voxeo.rayo.client.test.config.TestConfig;
 import com.voxeo.rayo.client.test.util.MockConnectionListener;
-import com.voxeo.servlet.xmpp.rayo.stanza.Bind;
-import com.voxeo.servlet.xmpp.rayo.stanza.IQ;
 
 public class ConnectionListenerTest {
 	

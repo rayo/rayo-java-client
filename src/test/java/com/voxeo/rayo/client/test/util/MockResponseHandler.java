@@ -1,7 +1,7 @@
 package com.voxeo.rayo.client.test.util;
 
-import com.voxeo.rayo.client.response.ResponseHandler;
-import com.voxeo.servlet.xmpp.rayo.stanza.XmppObject;
+import com.rayo.client.response.ResponseHandler;
+import com.rayo.client.xmpp.stanza.XmppObject;
 
 public class MockResponseHandler implements ResponseHandler {
 

@@ -5,12 +5,12 @@ import java.net.URISyntaxException;
 
 import javax.media.mscontrol.join.Joinable;
 
+import com.rayo.client.XmppException;
 import com.rayo.core.verb.VerbRef;
 import com.rayo.core.DialCommand;
 import com.rayo.core.JoinCommand;
 import com.rayo.core.JoinDestinationType;
 import com.voxeo.moho.Participant.JoinType;
-import com.voxeo.rayo.client.XmppException;
 
 public class DialSample5 extends BaseSample {
 

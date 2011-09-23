@@ -2,10 +2,10 @@ package com.voxeo.rayo.client.test.util;
 
 import java.util.Collection;
 
-import com.voxeo.rayo.client.auth.AuthenticationListener;
-import com.voxeo.servlet.xmpp.rayo.stanza.sasl.Challenge;
-import com.voxeo.servlet.xmpp.rayo.stanza.sasl.Failure;
-import com.voxeo.servlet.xmpp.rayo.stanza.sasl.Success;
+import com.rayo.client.auth.AuthenticationListener;
+import com.rayo.client.xmpp.stanza.sasl.Challenge;
+import com.rayo.client.xmpp.stanza.sasl.Failure;
+import com.rayo.client.xmpp.stanza.sasl.Success;
 
 public class MockAuthenticationListener implements AuthenticationListener {
 

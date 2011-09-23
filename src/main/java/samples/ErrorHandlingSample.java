@@ -1,8 +1,8 @@
 package samples;
 
+import com.rayo.client.xmpp.stanza.Error;
+import com.rayo.client.xmpp.stanza.IQ;
 import com.rayo.core.verb.VerbRef;
-import com.voxeo.servlet.xmpp.rayo.stanza.IQ;
-import com.voxeo.servlet.xmpp.rayo.stanza.Error;
 
 
 public class ErrorHandlingSample extends BaseSample {

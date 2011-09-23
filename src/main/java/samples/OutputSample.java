@@ -1,9 +1,15 @@
 package samples;
 
-import com.rayo.core.verb.ClientPauseCommand;
-import com.rayo.core.verb.ClientResumeCommand;
+import com.rayo.client.SimpleXmppConnection;
+import com.rayo.client.XmppConnection;
+import com.rayo.client.listener.RayoMessageListener;
+import com.rayo.client.verb.ClientPauseCommand;
+import com.rayo.client.verb.ClientResumeCommand;
+import com.rayo.client.verb.RefEvent;
+import com.rayo.client.xmpp.extensions.Extension;
+import com.rayo.client.xmpp.stanza.IQ;
+import com.rayo.client.xmpp.stanza.Stanza;
 import com.rayo.core.verb.Output;
-import com.rayo.core.verb.RefEvent;
 import com.rayo.core.verb.SeekCommand;
 import com.rayo.core.verb.SpeedDownCommand;
 import com.rayo.core.verb.SpeedUpCommand;
@@ -11,12 +17,6 @@ import com.rayo.core.verb.Ssml;
 import com.rayo.core.verb.VolumeDownCommand;
 import com.rayo.core.verb.VolumeUpCommand;
 import com.rayo.core.AnswerCommand;
-import com.voxeo.rayo.client.SimpleXmppConnection;
-import com.voxeo.rayo.client.XmppConnection;
-import com.voxeo.rayo.client.listener.RayoMessageListener;
-import com.voxeo.servlet.xmpp.rayo.extensions.Extension;
-import com.voxeo.servlet.xmpp.rayo.stanza.IQ;
-import com.voxeo.servlet.xmpp.rayo.stanza.Stanza;
 
 
 public class OutputSample {

@@ -1,8 +1,8 @@
 package com.voxeo.rayo.client.test.util;
 
-import com.voxeo.rayo.client.listener.StanzaAdapter;
-import com.voxeo.servlet.xmpp.rayo.stanza.Error;
-import com.voxeo.servlet.xmpp.rayo.stanza.IQ;
+import com.rayo.client.listener.StanzaAdapter;
+import com.rayo.client.xmpp.stanza.Error;
+import com.rayo.client.xmpp.stanza.IQ;
 
 public class MockStanzaListener extends StanzaAdapter {
 

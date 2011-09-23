@@ -2,10 +2,10 @@ package samples;
 
 import java.net.URI;
 
+import com.rayo.client.JmxClient;
 import com.rayo.core.verb.Conference;
 import com.rayo.core.verb.Ssml;
 import com.rayo.core.verb.VerbRef;
-import com.voxeo.rayo.client.JmxClient;
 
 
 public class ConferenceSample2 extends BaseSample {

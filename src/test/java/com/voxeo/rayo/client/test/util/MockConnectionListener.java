@@ -1,7 +1,7 @@
 package com.voxeo.rayo.client.test.util;
 
-import com.voxeo.rayo.client.XmppConnectionAdapter;
-import com.voxeo.servlet.xmpp.rayo.stanza.XmppObject;
+import com.rayo.client.XmppConnectionAdapter;
+import com.rayo.client.xmpp.stanza.XmppObject;
 
 public class MockConnectionListener extends XmppConnectionAdapter {
 

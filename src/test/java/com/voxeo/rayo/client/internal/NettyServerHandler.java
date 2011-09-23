@@ -12,10 +12,10 @@ import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 
-import com.rayo.core.verb.RefEvent;
-import com.voxeo.servlet.xmpp.rayo.extensions.Extension;
-import com.voxeo.servlet.xmpp.rayo.stanza.IQ;
-import com.voxeo.servlet.xmpp.rayo.util.Dom4jParser;
+import com.rayo.client.verb.RefEvent;
+import com.rayo.client.xmpp.extensions.Extension;
+import com.rayo.client.xmpp.stanza.IQ;
+import com.rayo.client.xmpp.util.Dom4jParser;
 
 public class NettyServerHandler extends SimpleChannelHandler {
 

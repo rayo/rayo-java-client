@@ -3,10 +3,10 @@ package com.voxeo.rayo.client.internal;
 import org.junit.After;
 import org.junit.Before;
 
-import com.voxeo.rayo.client.RayoClient;
-import com.voxeo.rayo.client.listener.RayoMessageListener;
+import com.rayo.client.RayoClient;
+import com.rayo.client.listener.RayoMessageListener;
+import com.rayo.client.xmpp.stanza.Stanza;
 import com.voxeo.rayo.client.test.config.TestConfig;
-import com.voxeo.servlet.xmpp.rayo.stanza.Stanza;
 
 public abstract class XmppIntegrationTest {
 

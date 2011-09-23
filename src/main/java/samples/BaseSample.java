@@ -1,11 +1,11 @@
 package samples;
 
-import com.voxeo.rayo.client.RayoClient;
-import com.voxeo.rayo.client.listener.StanzaListener;
-import com.voxeo.servlet.xmpp.rayo.stanza.Error;
-import com.voxeo.servlet.xmpp.rayo.stanza.IQ;
-import com.voxeo.servlet.xmpp.rayo.stanza.Message;
-import com.voxeo.servlet.xmpp.rayo.stanza.Presence;
+import com.rayo.client.RayoClient;
+import com.rayo.client.listener.StanzaListener;
+import com.rayo.client.xmpp.stanza.Error;
+import com.rayo.client.xmpp.stanza.IQ;
+import com.rayo.client.xmpp.stanza.Message;
+import com.rayo.client.xmpp.stanza.Presence;
 
 public abstract class BaseSample {
 

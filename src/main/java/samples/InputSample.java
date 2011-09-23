@@ -3,6 +3,12 @@ package samples;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.rayo.client.SimpleXmppConnection;
+import com.rayo.client.XmppConnection;
+import com.rayo.client.listener.RayoMessageListener;
+import com.rayo.client.xmpp.extensions.Extension;
+import com.rayo.client.xmpp.stanza.IQ;
+import com.rayo.client.xmpp.stanza.Stanza;
 import com.rayo.core.verb.Choices;
 import com.rayo.core.verb.Input;
 import com.rayo.core.verb.InputCompleteEvent;
@@ -10,12 +16,6 @@ import com.rayo.core.verb.InputMode;
 import com.rayo.core.verb.Output;
 import com.rayo.core.verb.Ssml;
 import com.rayo.core.AnswerCommand;
-import com.voxeo.rayo.client.SimpleXmppConnection;
-import com.voxeo.rayo.client.XmppConnection;
-import com.voxeo.rayo.client.listener.RayoMessageListener;
-import com.voxeo.servlet.xmpp.rayo.extensions.Extension;
-import com.voxeo.servlet.xmpp.rayo.stanza.IQ;
-import com.voxeo.servlet.xmpp.rayo.stanza.Stanza;
 
 
 public class InputSample {

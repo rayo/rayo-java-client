@@ -44,6 +44,7 @@ import com.rayo.core.verb.Record;
 import com.rayo.core.verb.RecordPauseCommand;
 import com.rayo.core.verb.RecordResumeCommand;
 import com.rayo.core.verb.Say;
+import com.rayo.core.verb.SeekCommand;
 import com.rayo.core.verb.SpeedDownCommand;
 import com.rayo.core.verb.SpeedUpCommand;
 import com.rayo.core.verb.Ssml;
@@ -861,6 +862,21 @@ public class RayoClient {
 			.setFrom(buildFrom())
 			.setTo(buildTo(ref.getCallId(),ref.getVerbId()))
 			.setChild(Extension.create(resume));
+		return sendIQ(iq);
+	}
+	
+	/**
+	 * Performs a seek operation on the given verb
+	 * 
+	 * @param ref Verb component that we want to resume
+	 * @param command Seek command to execute
+	 */
+	public IQ seek(VerbRef ref, SeekCommand command) throws XmppException {
+		
+		IQ iq = new IQ(IQ.Type.set)
+			.setFrom(buildFrom())
+			.setTo(buildTo(ref.getCallId(),ref.getVerbId()))
+			.setChild(Extension.create(command));
 		return sendIQ(iq);
 	}
 	

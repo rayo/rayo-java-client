@@ -215,7 +215,7 @@ public class RayoClient {
 	public OfferEvent waitForOffer(Integer timeout) throws XmppException {
 		
 		final StringBuilder callId = new StringBuilder();
-		addStanzaListener(new RayoMessageListener("offer") {
+		RayoMessageListener tempListener = new RayoMessageListener("offer") {
 			
 			@Override
 			@SuppressWarnings("rawtypes")
@@ -224,15 +224,20 @@ public class RayoClient {
 				Stanza stanza = (Stanza)object;
 				callId.append(stanza.getFrom().substring(0, stanza.getFrom().indexOf('@')));
 			}
-		});
-		OfferEvent stanza = waitFor("offer", OfferEvent.class, timeout);
-		
-		OfferEvent offer = new OfferEvent(callId.toString());
-		offer.setTo(stanza.getTo());
-		offer.setFrom(stanza.getFrom());
-		offer.setHeaders(stanza.getHeaders());
-		
-		return offer;
+		};
+		addStanzaListener(tempListener);
+		try {
+			OfferEvent stanza = waitFor("offer", OfferEvent.class, timeout);
+			
+			OfferEvent offer = new OfferEvent(callId.toString());
+			offer.setTo(stanza.getTo());
+			offer.setFrom(stanza.getFrom());
+			offer.setHeaders(stanza.getHeaders());
+			
+			return offer;
+		} finally {
+			removeStanzaListener(tempListener);
+		}
 	}
 	
 	/**

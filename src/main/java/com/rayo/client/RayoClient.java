@@ -200,6 +200,19 @@ public class RayoClient {
 	 * @throws XmppException If there is any problem waiting for offer event
 	 */
 	public OfferEvent waitForOffer() throws XmppException {
+	
+		return waitForOffer(null);
+	}
+	
+	/**
+	 * <p>Waits for an Offer Event. Shortcut method to wait for an incoming call.</p>
+	 * 
+	 * @timeout Timeout 
+	 * @return OfferEvent Offer event that has been received
+	 * 
+	 * @throws XmppException If there is any problem waiting for offer event
+	 */
+	public OfferEvent waitForOffer(Integer timeout) throws XmppException {
 		
 		final StringBuilder callId = new StringBuilder();
 		addStanzaListener(new RayoMessageListener("offer") {
@@ -212,7 +225,7 @@ public class RayoClient {
 				callId.append(stanza.getFrom().substring(0, stanza.getFrom().indexOf('@')));
 			}
 		});
-		OfferEvent stanza = waitFor("offer", OfferEvent.class);
+		OfferEvent stanza = waitFor("offer", OfferEvent.class, timeout);
 		
 		OfferEvent offer = new OfferEvent(callId.toString());
 		offer.setTo(stanza.getTo());
@@ -294,7 +307,7 @@ public class RayoClient {
 	 * @throws XmppException If there is any problem waiting for the message
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> T waitFor(String extensionName, Class<T> clazz, int timeout) throws XmppException {
+	public <T> T waitFor(String extensionName, Class<T> clazz, Integer timeout) throws XmppException {
 		
 		Extension extension = (Extension)connection.waitForExtension(extensionName, timeout);
 		return (T)extension.getObject();

@@ -31,9 +31,9 @@ public interface XmppConnection extends XmppObjectFilterSupport, AuthenticationS
 	public void removeXmppConnectionListener(XmppConnectionListener connectionListener);
 	
 	XmppObject waitFor(String node) throws XmppException;
-	XmppObject waitFor(String node, int timeout) throws XmppException;
+	XmppObject waitFor(String node, Integer timeout) throws XmppException;
 	Extension waitForExtension(String extensionName) throws XmppException;
-	Extension waitForExtension(String extensionName, int timeout) throws XmppException;
+	Extension waitForExtension(String extensionName, Integer timeout) throws XmppException;
 
 	public String getUsername();
 	public String getResource();

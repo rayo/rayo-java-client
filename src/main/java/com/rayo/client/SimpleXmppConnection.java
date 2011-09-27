@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import com.rayo.client.auth.AuthenticationHandler;
 import com.rayo.client.auth.AuthenticationListener;
@@ -301,14 +302,22 @@ public class SimpleXmppConnection implements XmppConnection {
 	}
 	
 	@Override
-	public XmppObject waitFor(String node, int timeout) throws XmppException {
+	public XmppObject waitFor(String node, Integer timeout) throws XmppException {
 
 		XmppObjectNameFilter filter = null;
 		try {
 			filter = new XmppObjectNameFilter(node);
 	        addFilter(filter);
 	
-	        XmppObject response = filter.poll(timeout);
+	        XmppObject response = null;
+	        if (timeout != null) {
+	        	response = filter.poll(timeout);
+	        } else {
+	        	response = filter.poll();
+	        }
+	        if (response == null) {
+	        	throw new XmppException(String.format("Timed out while waiting for [%s]",node));
+	        }	        
 	        return response;
 		} finally {
 			removeFilter(filter);
@@ -323,14 +332,22 @@ public class SimpleXmppConnection implements XmppConnection {
 	}
 	
 	@Override
-	public Extension waitForExtension(String extensionName, int timeout) throws XmppException {
+	public Extension waitForExtension(String extensionName, Integer timeout) throws XmppException {
 
 		XmppObjectExtensionNameFilter filter = null;
 		try {
 			filter = new XmppObjectExtensionNameFilter(extensionName);
 	        addFilter(filter);
 	
-	        XmppObject response = filter.poll(timeout);
+	        XmppObject response = null;
+	        if (timeout != null) {
+	        	response = filter.poll(timeout);
+	        } else {
+	        	response = filter.poll();
+	        }
+	        if (response == null) {
+	        	throw new XmppException(String.format("Timed out while waiting for [%s]",extensionName));
+	        }
 	        return (Extension)response;
 		} finally {
 			removeFilter(filter);

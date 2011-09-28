@@ -15,6 +15,6 @@ public class DialTest extends XmppIntegrationTest {
 		rayo.dial(new URI("tel:123456789"));
 		
 		Thread.sleep(400);
-		assertServerReceived("<iq id=\"*\" type=\"set\" from=\"userc@localhost/voxeo\" to=\"localhost\"><dial xmlns=\"urn:xmpp:rayo:1\" to=\"tel:123456789\" from=\"sip:userc@127.0.0.1:5060\"></dial></iq>");
+		assertServerReceived("<iq id=\"*\" type=\"set\" from=\"userc@localhost/voxeo\" to=\"localhost\"><dial xmlns=\"urn:xmpp:rayo:1\" to=\"tel:123456789\" from=\"sip:127.0.0.1:5060\"></dial></iq>");
 	}	
 }

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import java.util.concurrent.TimeoutException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -93,10 +94,17 @@ public class ConnectionTest {
 		connection.login("userc", "1", "voxeo");
 		
 		long time = System.currentTimeMillis();
-		XmppObject object = connection.waitFor("something", 100);
-		long timeoff = System.currentTimeMillis();
-		assertNull(object);
-		assertTrue(timeoff - time >= 100 && timeoff - time < 300);
+		XmppObject object = null;
+		try {
+			object = connection.waitFor("something", 100);
+		} catch (XmppException xe) {
+			assertTrue(xe.getMessage().startsWith("Timed out"));
+			long timeoff = System.currentTimeMillis();
+			assertNull(object);
+			assertTrue(timeoff - time >= 100 && timeoff - time < 300);
+			return;
+		}
+		fail("Expected timeout exception");
 	}	
 
 	@Test
@@ -108,11 +116,15 @@ public class ConnectionTest {
 		((SimpleXmppConnection)connection).setDefaultTimeout(100);
 		
 		long time = System.currentTimeMillis();
-		XmppObject object = connection.waitFor("something");
-		long timeoff = System.currentTimeMillis();
-		assertNull(object);
-		System.out.println("Test time: " + (timeoff - time));
-		assertTrue(timeoff - time >= 100 && timeoff - time < 300);
+		XmppObject object = null;
+		try {
+			connection.waitFor("something");
+		} catch (XmppException xe) {
+			assertTrue(xe.getMessage().startsWith("Timed out"));
+			long timeoff = System.currentTimeMillis();
+			assertNull(object);	
+		}
+		fail("Expected timeout exception");
 	}	
 
 	@Test
@@ -123,10 +135,17 @@ public class ConnectionTest {
 		connection.login("userc", "1", "voxeo");
 		
 		long time = System.currentTimeMillis();
-		XmppObject object = connection.waitForExtension("something", 100);
-		long timeoff = System.currentTimeMillis();
-		assertNull(object);
-		assertTrue(timeoff - time >= 100 && timeoff - time < 300);
+		XmppObject object = null;
+		try {
+			object = connection.waitForExtension("something", 100);
+		} catch (XmppException xe) {
+			assertTrue(xe.getMessage().startsWith("Timed out"));
+			long timeoff = System.currentTimeMillis();
+			assertNull(object);
+			assertTrue(timeoff - time >= 100 && timeoff - time < 300);
+			return;
+		}
+		fail("Expected timeout exception");
 	}	
 
 	@Test
@@ -138,11 +157,18 @@ public class ConnectionTest {
 		((SimpleXmppConnection)connection).setDefaultTimeout(100);
 		
 		long time = System.currentTimeMillis();
-		XmppObject object = connection.waitForExtension("something");
-		long timeoff = System.currentTimeMillis();
-		assertNull(object);
-		System.out.println("Test time: " + (timeoff - time));
-		assertTrue(timeoff - time >= 100 && timeoff - time < 300);
+		XmppObject object = null;
+		try {
+			object = connection.waitForExtension("something");
+		} catch (XmppException xe) {
+			assertTrue(xe.getMessage().startsWith("Timed out"));
+			long timeoff = System.currentTimeMillis();
+			assertNull(object);
+			System.out.println("Test time: " + (timeoff - time));
+			assertTrue(timeoff - time >= 100 && timeoff - time < 300);
+			return;
+		}
+		fail("Expected timeout exception");
 	}
 	
 	@Test

@@ -122,7 +122,8 @@ public class ConnectionTest {
 		} catch (XmppException xe) {
 			assertTrue(xe.getMessage().startsWith("Timed out"));
 			long timeoff = System.currentTimeMillis();
-			assertNull(object);	
+			assertNull(object);
+			return;
 		}
 		fail("Expected timeout exception");
 	}	

@@ -13,6 +13,8 @@ import com.rayo.client.auth.AuthenticationListener;
 import com.rayo.client.filter.XmppObjectFilter;
 import com.rayo.client.listener.RayoMessageListener;
 import com.rayo.client.listener.StanzaListener;
+import com.rayo.client.registry.Call;
+import com.rayo.client.registry.CallsRegistry;
 import com.rayo.client.verb.ClientPauseCommand;
 import com.rayo.client.verb.ClientResumeCommand;
 import com.rayo.client.verb.RefEvent;
@@ -68,6 +70,8 @@ public class RayoClient {
 	protected final XmppConnection connection;
 	private static final String DEFAULT_RESOURCE = "voxeo";
 
+	private CallsRegistry callRegistry = new CallsRegistry();
+	
 	/**
 	 * Creates a new client object. This object will be used to interact with an Rayo server.
 	 * 
@@ -116,20 +120,38 @@ public class RayoClient {
 		
 		connection.connect();
 		connection.login(username, password, resource);
-		/*
-		 * Left as example
-		 * 
+		
 		connection.addStanzaListener(new RayoMessageListener("offer") {
 			
 			@Override
 			@SuppressWarnings("rawtypes")
 			public void messageReceived(Object object) {
 				
+				//TODO: Stanza should have methods to fetch the JID node name, domain, etc.
 				Stanza stanza = (Stanza)object;
-				lastCallId = stanza.getFrom().substring(0, stanza.getFrom().indexOf('@'));
+				int at = stanza.getFrom().indexOf('@');
+				String callId = stanza.getFrom().substring(0, at);
+				String domain = stanza.getFrom().substring(at+1);
+				if (domain.contains(":")) {
+					domain = domain.substring(0, domain.indexOf(':'));
+				}
+				Call call = new Call(callId, domain);
+				callRegistry.registerCall(callId, call);
 			}
 		});
-		*/		
+		connection.addStanzaListener(new RayoMessageListener("end") {
+			
+			@Override
+			@SuppressWarnings("rawtypes")
+			public void messageReceived(Object object) {
+				
+				//TODO: Stanza should have methods to fetch the JID node name, domain, etc.
+				Stanza stanza = (Stanza)object;
+				int at = stanza.getFrom().indexOf('@');
+				String callId = stanza.getFrom().substring(0, at);
+				callRegistry.unregisterCal(callId);
+			}
+		});				
 	}
 
 	/**
@@ -580,18 +602,7 @@ public class RayoClient {
 		UnmuteCommand unmute = new UnmuteCommand();
 		return command(unmute,callId);
 	}	
-	/**
-	 * Calls a specific destination
-	 * 
-	 * @param text URI to call in text format
-	 * 
-	 * @throws XmppException If there is any issue while dialing
-	 * @throws URISyntaxException If the specified text is not a valid URI
-	 */
-	public VerbRef dial(String text) throws XmppException, URISyntaxException {
 
-		return dial(new URI(text));
-	}
 	
 	/**
 	 * Calls a specific destination
@@ -602,11 +613,27 @@ public class RayoClient {
 	 */
 	public VerbRef dial(URI to) throws XmppException {
 
-		return dial(null, to);
+		return dial(null, null, to);
 	}
 	
+	
 	/**
-	 * Calls a specific destination from the specified call id
+	 * Sends a dial message to the specified Rayo/Gateway node
+	 * to dial a destination from the specified URI
+	 * 
+	 * @param to URI that we want to dial
+	 * 
+	 * @throws XmppException If there is any issue while transfering the call
+	 */
+	public VerbRef dial(String destination, URI to) throws XmppException {
+
+		return dial(destination, null, to);
+	}
+	
+	
+	/**
+	 * Sends a dial message to the connected node
+	 * to dial a destination from the specified URI
 	 * 
 	 * @param from URI that is dialing
 	 * @param to URI that we want to dial
@@ -615,20 +642,33 @@ public class RayoClient {
 	 */
 	public VerbRef dial(URI from, URI to) throws XmppException {
 
+		return dial(null, from, to);
+	}
+	
+	/**
+	 * Sends a dial message to a specific rayo node or gateway 
+	 * to dial a destination from the specified URI
+	 * 
+	 * @param String Rayo/Gateway node
+	 * @param from URI that is dialing
+	 * @param to URI that we want to dial
+	 * 
+	 * @throws XmppException If there is any issue while transfering the call
+	 */
+	public VerbRef dial(String destination, URI from, URI to) throws XmppException {
+
 		DialCommand dial = new DialCommand();
 		dial.setTo(to);
 		dial.setFrom(from);
-		try {
-			dial.setFrom(new URI("sip:userc@127.0.0.1:5060"));
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
 		IQ iq = new IQ(IQ.Type.set)
 			.setFrom(buildFrom())
-			.setTo(connection.getServiceName())
 			.setChild(Extension.create(dial));
+		if (destination != null) {
+			iq.setTo(destination);
+		} else {
+			iq.setTo(connection.getServiceName());
+		}
 		
 		return sendAndGetRef(null, iq);
 	}
@@ -639,7 +679,7 @@ public class RayoClient {
 		IQ result = ((IQ)connection.sendAndWait(iq));
 		if (result != null) {
 			if (result.hasChild("error")) {
-				throw new XmppException(iq.getError());
+				throw new XmppException(result.getError());
 			}
 			RefEvent reference = (RefEvent)result.getExtension().getObject();
 			ref = new VerbRef(callId, reference.getJid());
@@ -1045,14 +1085,24 @@ public class RayoClient {
 		return connection.getUsername() + "@" + connection.getServiceName() + "/" + connection.getResource();
 	}
 	
-	private String buildTo(String callid) {
+	private String buildTo(String callId) {
 		
-		return callid + "@" + connection.getServiceName();
+		return buildTo(callId, null);
 	}
 
-	private String buildTo(String callid, String resourceId) {
+	private String buildTo(String callId, String resourceId) {
 		
-		return callid + "@" + connection.getServiceName() + "/" + resourceId;
+		Call call = callRegistry.get(callId);
+		String to;
+		if (call != null) {
+			to = callId + "@" + call.getCallDomain();
+		} else {
+			to = callId + "@" + connection.getServiceName();
+		}
+		if (resourceId != null) {
+			to = to + "/" + resourceId;
+		}
+		return to;
 	}
 	
 	public XmppConnection getXmppConnection() {

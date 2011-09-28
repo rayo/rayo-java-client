@@ -1,5 +1,6 @@
 package com.rayo.client;
 
+import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -659,6 +660,13 @@ public class RayoClient {
 
 		DialCommand dial = new DialCommand();
 		dial.setTo(to);
+		if (from == null) {
+			try {
+				from = new URI(String.format("sip:%s:5060",InetAddress.getLocalHost().getHostAddress()));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 		dial.setFrom(from);
 		
 		IQ iq = new IQ(IQ.Type.set)

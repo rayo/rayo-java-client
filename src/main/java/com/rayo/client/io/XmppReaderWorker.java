@@ -109,6 +109,7 @@ public class XmppReaderWorker implements Runnable {
     	
         try {
             int eventType = parser.getEventType();
+            System.out.println("Received event type: " + eventType);
             do {
                 if (eventType == XmlPullParser.START_TAG) {
                     if (parser.getName().equals("message")) {
@@ -290,8 +291,7 @@ public class XmppReaderWorker implements Runnable {
         //TODO: Lots of stuff to handle here. Code based in Packet reader from Smack
         
         // Release the lock after TLS has been negotiated or we are not insterested in TLS
-        if (!startTLSReceived)
-        {
+        if (!startTLSReceived || (startTLSReceived && !startTLSRequired)) {
         	connectionEstablished();
         }
     }

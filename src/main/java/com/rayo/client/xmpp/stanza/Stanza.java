@@ -2,6 +2,8 @@ package com.rayo.client.xmpp.stanza;
 
 import org.dom4j.Element;
 
+import com.rayo.client.util.JID;
+import com.rayo.client.util.JIDImpl;
 import com.rayo.client.xmpp.extensions.Extension;
 
 
@@ -67,6 +69,16 @@ public abstract class Stanza<T extends XmppObject> extends AbstractXmppObject {
 		
 		//TODO: Lots of stuff. Caching,Stringprep, nodeprep, etc.
 		return attribute("to");
+	}
+	
+	public JID getFromJid() {
+		
+		return new JIDImpl(getFrom());
+	}
+	
+	public JID getToJid() {
+		
+		return new JIDImpl(getTo());
 	}
 
     public T setTo(String to) {

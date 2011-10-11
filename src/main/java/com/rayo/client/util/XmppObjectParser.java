@@ -747,6 +747,8 @@ public class XmppObjectParser {
                 else {
                 	// Condition tag, it can be xmpp error or an application defined error.
                     String elementName = parser.getName();
+                    //TODO: BUG in XMPP Servlets
+                    elementName = elementName.replaceAll("_", "-");
                     String namespace = parser.getNamespace();
                     if (errorNamespace.equals(namespace) || errorStreamNamespace.equals(namespace)) {
                     	condition = Error.Condition.fromXMPP(elementName);

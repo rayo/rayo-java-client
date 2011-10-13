@@ -73,7 +73,7 @@ public class Presence extends Stanza<Presence> {
 	
 	public Presence setShow(Show show) {
 		
-		set("show", show.toString());
+		set("show", show.toString().toUpperCase());
 		return this;
 	}
 	

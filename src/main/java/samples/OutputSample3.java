@@ -19,7 +19,7 @@ public class OutputSample3 extends BaseSample {
 	public static void main(String[] args) throws Exception {
 		
 		OutputSample3 sample = new OutputSample3();
-		sample.connect("localhost", "usera", "1");
+		sample.connect("localhost", "usera", "1", "localhost");
 		sample.run();
 		sample.shutdown();
 	}

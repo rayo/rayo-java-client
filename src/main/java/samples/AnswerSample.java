@@ -10,14 +10,14 @@ public class AnswerSample extends BaseSample {
 		String callId = client.waitForOffer().getCallId();
 		client.answer(callId);
 
-		Thread.sleep(500000);
+		Thread.sleep(5000);
 		client.hangup(callId);
 	}
 	
 	public static void main(String[] args) throws Exception {
 		
 		AnswerSample sample = new AnswerSample();
-		sample.connect("localhost", "usera", "1");
+		sample.connect("localhost", "usera", "1", "localhost");
 		sample.run();
 		sample.shutdown();
 	}

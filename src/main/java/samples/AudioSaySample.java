@@ -17,7 +17,7 @@ public class AudioSaySample extends BaseSample {
 	public static void main(String[] args) throws Exception {
 		
 		AudioSaySample sample = new AudioSaySample();
-		sample.connect("localhost", "usera", "1");
+		sample.connect("localhost", "usera", "1", "localhost");
 		sample.run();
 		sample.shutdown();
 	}

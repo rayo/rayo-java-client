@@ -16,7 +16,7 @@ public class MixerSample extends BaseSample {
 
 	public void run() throws Exception {
 		
-		connect("localhost", "userc", "1");
+		connect("localhost", "userc", "1", "localhost");
 		
 		String firstCall = client.waitForOffer().getCallId();
 		client.answer(firstCall);

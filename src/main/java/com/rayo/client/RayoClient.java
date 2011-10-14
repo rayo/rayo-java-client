@@ -21,6 +21,8 @@ import com.rayo.client.verb.ClientResumeCommand;
 import com.rayo.client.verb.RefEvent;
 import com.rayo.client.xmpp.extensions.Extension;
 import com.rayo.client.xmpp.stanza.IQ;
+import com.rayo.client.xmpp.stanza.Presence;
+import com.rayo.client.xmpp.stanza.Presence.Show;
 import com.rayo.client.xmpp.stanza.Stanza;
 import com.rayo.core.AcceptCommand;
 import com.rayo.core.AnswerCommand;
@@ -73,16 +75,18 @@ public class RayoClient {
 
 	private CallsRegistry callRegistry = new CallsRegistry();
 	
+	private String rayoServer;
+	
 	/**
 	 * Creates a new client object. This object will be used to interact with an Rayo server.
 	 * 
-	 * @param server Server that this client will be connecting to
+	 * @param server Rayo Server that this client will be connecting to
 	 */
-	public RayoClient(String server) {
+	public RayoClient(String xmppServer, String rayoServer) {
 
-		this(server, null);
+		this(xmppServer, null, rayoServer);
 	}
-
+	
 	/**
 	 * Creates a new client object that will use the specified port number. 
 	 * This object will be used to interact with an Rayo server.
@@ -90,9 +94,10 @@ public class RayoClient {
 	 * @param server Server that this client will be connecting to
 	 * @param port Port number that the server is listening at
 	 */
-	public RayoClient(String server, Integer port) {
+	public RayoClient(String xmppServer, Integer port, String rayoServer) {
 
-		connection = new SimpleXmppConnection(server, port);
+		connection = new SimpleXmppConnection(xmppServer, port);
+		this.rayoServer = rayoServer;
 	}
 	
 	/**
@@ -152,7 +157,24 @@ public class RayoClient {
 				String callId = stanza.getFrom().substring(0, at);
 				callRegistry.unregisterCal(callId);
 			}
-		});				
+		});	
+		
+		broadcastAvailability();
+	}
+
+	private void broadcastAvailability() throws XmppException {
+
+/*		
+		Presence presence = new Presence()
+			.setFrom(connection.getUsername() + "@" + connection.getServiceName() + "/" + connection.getResource())
+			.setTo(connection.getServiceName())
+			.setShow(Show.chat);
+		connection.send(presence);
+*/
+		Presence presence = new Presence()
+			.setShow(Show.chat);
+		connection.send(presence);
+
 	}
 
 	/**
@@ -1051,7 +1073,7 @@ public class RayoClient {
         
 		IQ iq = new IQ(IQ.Type.set)
             .setFrom(buildFrom())
-            .setTo(connection.getServiceName()) // dials only use service name
+            .setTo(connection.getServiceName()) 
             .setChild(Extension.create(command));
         VerbRef ref = sendAndGetRef(null, iq);
         return ref;
@@ -1100,13 +1122,7 @@ public class RayoClient {
 
 	private String buildTo(String callId, String resourceId) {
 		
-		Call call = callRegistry.get(callId);
-		String to;
-		if (call != null) {
-			to = callId + "@" + call.getCallDomain();
-		} else {
-			to = callId + "@" + connection.getServiceName();
-		}
+		String to = callId + "@" + rayoServer;
 		if (resourceId != null) {
 			to = to + "/" + resourceId;
 		}

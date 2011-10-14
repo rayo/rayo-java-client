@@ -121,6 +121,7 @@ public class Presence extends Stanza<Presence> {
 	 * <p>Defines the different Presence types. If a Presence node has a <code>null</code> type, then it is considered to 
 	 * be "available". Following are all the different Presence types:</p>
 	 * <ul>
+	 *     <li><strong>PresenceType.available</strong> : The entity is available.</li>
 	 *     <li><strong>PresenceType.unavailable</strong> : The entity is not available.</li>
 	 *     <li><strong>PresenceType.subscribe</strong> : The sender wants to subscribe to the receiver presence status.</li>
 	 *     <li><strong>PresenceType.subscribed</strong> : The sender has allowed presence tracking to the receiver.</li>
@@ -133,7 +134,7 @@ public class Presence extends Stanza<Presence> {
 	 */	
 	public enum Type {
 		
-		unavailable, subscribe, subscribed, unsubscribe, unsubscribed, probe, error;
+		available, unavailable, subscribe, subscribed, unsubscribe, unsubscribed, probe, error;
 	}
 	
 	/**

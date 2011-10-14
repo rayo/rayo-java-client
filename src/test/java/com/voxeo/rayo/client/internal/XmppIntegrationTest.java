@@ -21,7 +21,7 @@ public abstract class XmppIntegrationTest {
 		
 		server = NettyServer.newInstance(TestConfig.port);
 
-		rayo = new RayoClient(TestConfig.serverEndpoint, TestConfig.port);
+		rayo = new RayoClient(TestConfig.serverEndpoint, TestConfig.port, TestConfig.serverEndpoint);
 		login(username, "1", "voxeo");
 		
 		rayo.addStanzaListener(new RayoMessageListener("offer") {

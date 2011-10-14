@@ -20,7 +20,7 @@ public class AskSample extends BaseSample {
 	public static void main(String[] args) throws Exception {
 		
 		AskSample sample = new AskSample();
-		sample.connect("localhost", "user100", "1");
+		sample.connect("localhost", "user100", "1", "localhost");
 		sample.run();
 		sample.shutdown();
 	}

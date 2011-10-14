@@ -11,12 +11,12 @@ public abstract class BaseSample {
 
 	protected RayoClient client;
 	
-	public void connect(String server, String username, String password) throws Exception {
+	public void connect(String xmppServer, String username, String password, String rayoServer) throws Exception {
 		
-		client = new RayoClient(server);
+		client = new RayoClient(xmppServer, rayoServer);
 		login(username,password,"voxeo");
 	}
-		
+	
 	public void shutdown() throws Exception {
 		
 		client.disconnect();

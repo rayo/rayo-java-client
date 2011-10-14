@@ -29,7 +29,7 @@ public class ErrorHandlingSample extends BaseSample {
 	public static void main(String[] args) throws Exception {
 		
 		ErrorHandlingSample sample = new ErrorHandlingSample();
-		sample.connect("localhost", "usera", "1");
+		sample.connect("localhost", "usera", "1", "localhost");
 		sample.run();
 		sample.shutdown();
 	}

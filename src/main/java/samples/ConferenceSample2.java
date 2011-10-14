@@ -56,7 +56,7 @@ public class ConferenceSample2 extends BaseSample {
 	public static void main(String[] args) throws Exception {
 		
 		ConferenceSample2 sample1 = new ConferenceSample2();
-		sample1.connect("localhost", "usera", "1");
+		sample1.connect("localhost", "usera", "1", "localhost");
 		
 
 		// Launch your first soft phone to answer this call

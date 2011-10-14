@@ -46,7 +46,7 @@ public class DialSample2 extends BaseSample {
 	public static void main(String[] args) throws Exception {
 		
 		DialSample2 sample = new DialSample2();
-		sample.connect("localhost", "usera", "1");
+		sample.connect("localhost", "usera", "1", "localhost");
 		sample.run();
 		sample.shutdown();
 	}	

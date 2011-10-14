@@ -16,7 +16,7 @@ public class DialSample4a extends BaseSample {
 		System.out.println("CLIENT A");
 		System.out.println("--------------");
 		DialSample4a sample = new DialSample4a();
-		sample.connect("localhost", "usera", "1");
+		sample.connect("localhost", "usera", "1", "localhost");
 		sample.run();
 		sample.shutdown();
 	}	

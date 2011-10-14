@@ -23,7 +23,7 @@ public class RecordSample2 extends BaseSample {
 	public static void main(String[] args) throws Exception {
 		
 		RecordSample2 sample = new RecordSample2();
-		sample.connect("localhost", "userc", "1");
+		sample.connect("localhost", "userc", "1", "localhost");
 		sample.run();
 		sample.shutdown();
 	}

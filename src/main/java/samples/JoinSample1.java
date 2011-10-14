@@ -10,7 +10,7 @@ public class JoinSample1 extends BaseSample {
 
 	public void run() throws Exception {
 		
-		connect("localhost", "user100", "1");
+		connect("localhost", "usera", "1", "localhost");
 		
 		String callId = client.waitForOffer().getCallId();
 		client.answer(callId);

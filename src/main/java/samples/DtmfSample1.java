@@ -15,7 +15,7 @@ public class DtmfSample1 extends BaseSample {
 	public static void main(String[] args) throws Exception {
 		
 		DtmfSample1 sample = new DtmfSample1();
-		sample.connect("localhost", "user100", "1");
+		sample.connect("localhost", "user100", "1", "localhost");
 		sample.run();
 		sample.shutdown();
 	}

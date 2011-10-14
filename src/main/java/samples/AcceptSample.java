@@ -1,16 +1,15 @@
 package samples;
 
-import java.net.URI;
 
-public class AudioSaySample2 extends BaseSample {
+public class AcceptSample extends BaseSample {
 
 	public void run() throws Exception {
+
+		// Two answers should be NOOP
 		
 		String callId = client.waitForOffer().getCallId();
-		client.answer(callId);
-
-		// Does not exist. It should throw an error
-		client.say(new URI("http://ccmixter.org/DoKashiteru/DoKashiteru_-_you_(na-na-na-na).mp3"), callId);
+		client.accept(callId);
+		client.accept(callId);
 
 		Thread.sleep(500000);
 		client.hangup(callId);
@@ -18,7 +17,7 @@ public class AudioSaySample2 extends BaseSample {
 	
 	public static void main(String[] args) throws Exception {
 		
-		AudioSaySample2 sample = new AudioSaySample2();
+		AcceptSample sample = new AcceptSample();
 		sample.connect("localhost", "usera", "1", "localhost");
 		sample.run();
 		sample.shutdown();

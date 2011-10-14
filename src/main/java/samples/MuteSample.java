@@ -25,7 +25,7 @@ public class MuteSample extends BaseSample {
 	public static void main(String[] args) throws Exception {
 		
 		MuteSample sample = new MuteSample();
-		sample.connect("localhost", "userc", "1");
+		sample.connect("localhost", "userc", "1", "localhost");
 		sample.run();
 		sample.shutdown();
 	}

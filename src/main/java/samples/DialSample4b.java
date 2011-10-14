@@ -34,7 +34,7 @@ public class DialSample4b extends BaseSample {
 		System.out.println("CLIENT B");
 		System.out.println("--------------");
 		DialSample4b sample = new DialSample4b();
-		sample.connect("localhost", "user100", "1");
+		sample.connect("localhost", "user100", "1", "localhost");
 		sample.run();
 		sample.shutdown();
 	}	

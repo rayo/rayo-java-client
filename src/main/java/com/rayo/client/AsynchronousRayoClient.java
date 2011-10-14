@@ -12,12 +12,12 @@ import com.rayo.client.xmpp.stanza.IQ;
 public class AsynchronousRayoClient extends RayoClient {
 
 	
-	public AsynchronousRayoClient(String server, Integer port) {
-		super(server, port);
+	public AsynchronousRayoClient(String server, Integer port, String rayoServer) {
+		super(server, port, rayoServer);
 	}
 
-	public AsynchronousRayoClient(String server) {
-		super(server);
+	public AsynchronousRayoClient(String server, String rayoServer) {
+		super(server, rayoServer);
 	}
 
 	@Override

@@ -108,8 +108,7 @@ public class XmppReaderWorker implements Runnable {
     private void parse() {
     	
         try {
-            int eventType = parser.getEventType();
-            System.out.println("Received event type: " + eventType);
+            int eventType = parser.getEventType();            
             do {
                 if (eventType == XmlPullParser.START_TAG) {
                     if (parser.getName().equals("message")) {

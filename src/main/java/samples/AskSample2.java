@@ -47,7 +47,7 @@ public class AskSample2 extends BaseSample {
 	public static void main(String[] args) throws Exception {
 		
 		AskSample2 sample = new AskSample2();
-		sample.connect("localhost", "userc", "1");
+		sample.connect("localhost", "userc", "1", "localhost");
 		sample.run();
 		sample.shutdown();
 	}

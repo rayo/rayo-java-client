@@ -22,7 +22,7 @@ public class RedirectSample extends BaseSample {
 	public static void main(String[] args) throws Exception {
 		
 		RedirectSample sample = new RedirectSample();
-		sample.connect("localhost", "userc", "1");
+		sample.connect("localhost", "userc", "1", "localhost");
 		sample.run();
 		sample.shutdown();
 	}	

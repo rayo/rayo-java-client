@@ -30,7 +30,7 @@ public class ConferenceSample extends BaseSample {
 	public static void main(String[] args) throws Exception {
 		
 		ConferenceSample sample1 = new ConferenceSample();
-		sample1.connect("localhost", "usera", "1");
+		sample1.connect("localhost", "usera", "1", "localhost");
 		
         Conference conference = new Conference();
         conference.setRoomName("1238");

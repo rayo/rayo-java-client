@@ -16,7 +16,7 @@ public class SsmlSaySample extends BaseSample {
 	public static void main(String[] args) throws Exception {
 		
 		SsmlSaySample sample = new SsmlSaySample();
-		sample.connect("localhost", "usera", "1");
+		sample.connect("localhost", "usera", "1", "localhost");
 		sample.run();
 		sample.shutdown();
 	}

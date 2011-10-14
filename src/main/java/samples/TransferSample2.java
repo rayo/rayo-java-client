@@ -24,7 +24,7 @@ public class TransferSample2 extends BaseSample {
 	public static void main(String[] args) throws Exception {
 
 		TransferSample2 sample = new TransferSample2();
-		sample.connect("localhost", "userc", "1");
+		sample.connect("localhost", "userc", "1", "localhost");
 		sample.run();
 		sample.shutdown();
 	}	

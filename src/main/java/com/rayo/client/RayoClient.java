@@ -693,12 +693,8 @@ public class RayoClient {
 		
 		IQ iq = new IQ(IQ.Type.set)
 			.setFrom(buildFrom())
+			.setTo(rayoServer)
 			.setChild(Extension.create(dial));
-		if (destination != null) {
-			iq.setTo(destination);
-		} else {
-			iq.setTo(connection.getServiceName());
-		}
 		
 		return sendAndGetRef(null, iq);
 	}

@@ -1069,7 +1069,7 @@ public class RayoClient {
         
 		IQ iq = new IQ(IQ.Type.set)
             .setFrom(buildFrom())
-            .setTo(connection.getServiceName()) 
+            .setTo(rayoServer) 
             .setChild(Extension.create(command));
         VerbRef ref = sendAndGetRef(null, iq);
         return ref;

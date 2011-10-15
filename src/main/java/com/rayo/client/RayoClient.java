@@ -5,6 +5,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.media.mscontrol.join.Joinable;
 
@@ -21,6 +23,7 @@ import com.rayo.client.verb.ClientResumeCommand;
 import com.rayo.client.verb.RefEvent;
 import com.rayo.client.xmpp.extensions.Extension;
 import com.rayo.client.xmpp.stanza.IQ;
+import com.rayo.client.xmpp.stanza.Ping;
 import com.rayo.client.xmpp.stanza.Presence;
 import com.rayo.client.xmpp.stanza.Presence.Show;
 import com.rayo.client.xmpp.stanza.Stanza;
@@ -160,6 +163,26 @@ public class RayoClient {
 		});	
 		
 		broadcastAvailability();
+		
+		TimerTask pingTask = new TimerTask() {
+			
+			@Override
+			public void run() {
+
+				ping();
+			}
+		};
+		new Timer().schedule(pingTask, 1000, 30000);
+		
+		connection.addStanzaListener(new RayoMessageListener("ping") {
+			
+			@Override
+			public void messageReceived(Object object) {
+
+				// pong
+				ping();
+			}
+		});
 	}
 
 	private void broadcastAvailability() throws XmppException {
@@ -1128,5 +1151,17 @@ public class RayoClient {
 	public XmppConnection getXmppConnection() {
 		
 		return connection;
+	}
+
+	private void ping() {
+		IQ ping = new IQ(IQ.Type.get)
+			.setFrom(buildFrom())
+			.setTo(rayoServer)
+			.setChild(new Ping());
+		try {
+			sendIQ(ping);
+		} catch (XmppException e) {
+			e.printStackTrace();
+		}
 	}
 }

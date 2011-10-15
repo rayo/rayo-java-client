@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import com.rayo.client.auth.AuthenticationHandler;
 import com.rayo.client.auth.AuthenticationListener;
@@ -29,9 +28,9 @@ import com.rayo.client.response.FilterCleaningResponseHandler;
 import com.rayo.client.response.ResponseHandler;
 import com.rayo.client.xmpp.extensions.Extension;
 import com.rayo.client.xmpp.stanza.Error;
-import com.rayo.client.xmpp.stanza.XmppObject;
 import com.rayo.client.xmpp.stanza.Error.Condition;
 import com.rayo.client.xmpp.stanza.Error.Type;
+import com.rayo.client.xmpp.stanza.XmppObject;
 
 public class SimpleXmppConnection implements XmppConnection {
 

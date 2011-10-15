@@ -9,6 +9,7 @@ public interface Namespaces {
 	public static final String SESSION = "urn:ietf:params:xml:ns:xmpp-session";
 	public static final String REGISTER = "jabber:iq:register";
 	public static final String AUTH = "jabber:iq:auth";
+	public static final String PING = "urn:xmpp:ping";
 	
 	public static final String RAYO = "urn:xmpp:rayo:1";
 }

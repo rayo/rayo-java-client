@@ -24,6 +24,7 @@ import com.rayo.client.xmpp.stanza.Bind;
 import com.rayo.client.xmpp.stanza.Error;
 import com.rayo.client.xmpp.stanza.IQ;
 import com.rayo.client.xmpp.stanza.Message;
+import com.rayo.client.xmpp.stanza.Ping;
 import com.rayo.client.xmpp.stanza.Presence;
 import com.rayo.client.xmpp.stanza.Session;
 import com.rayo.client.xmpp.stanza.Stanza;
@@ -259,7 +260,9 @@ public class XmppObjectParser {
                     iqPacket.setChild(parseResourceBinding(parser));
                 } else if (elementName.equals("session") && namespace.equals(Namespaces.SESSION)) {
                     iqPacket.setChild(parseSession(parser));
-                }                
+                } else if (elementName.equals("ping") && namespace.equals(Namespaces.PING)) {
+                	iqPacket.setChild(parsePing(parser));
+                }
                 // Otherwise, see if there is a registered provider for
                 // this element name and namespace.
                 else {
@@ -514,6 +517,24 @@ public class XmppObjectParser {
 
         return session;
     }
+    
+    private static Ping parsePing(XmlPullParser parser) throws IOException, XmlPullParserException {
+    	
+        Ping ping = new Ping();
+        boolean done = false;
+        while (!done) {
+            int eventType = parser.next();
+            if (eventType == XmlPullParser.START_TAG) {
+            } else if (eventType == XmlPullParser.END_TAG) {
+                if (parser.getName().equals("ping")) {
+                    done = true;
+                }
+            }
+        }
+
+        return ping;
+    }
+    
     /**
      * Parse the available SASL mechanisms reported from the server.
      *

@@ -172,17 +172,25 @@ public class RayoClient {
 				ping();
 			}
 		};
-		new Timer().schedule(pingTask, 1000, 30000);
+		new Timer().schedule(pingTask, 5000, 30000);
 		
 		connection.addStanzaListener(new RayoMessageListener("ping") {
 			
 			@Override
 			public void messageReceived(Object object) {
 
-				// pong
-				ping();
+				IQ iq = (IQ)object;
+				if (!iq.isError()) {
+					// pong
+					try {
+						sendIQ(iq.result());
+					} catch (XmppException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 		});
+		
 	}
 
 	private void broadcastAvailability() throws XmppException {

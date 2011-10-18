@@ -39,6 +39,13 @@ public interface XmppObject {
 	public Element getChildElement(String childName);
 
 	/**
+	 * Returns the dom4j child elements
+	 * 
+	 * @return Element dom4j child elements 
+	 */
+	public List<Element> getChildElements();
+	
+	/**
 	 * Returns the dom4j child elements with the given name
 	 * 
 	 * @param String child's name

@@ -4,21 +4,21 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import java.util.concurrent.TimeoutException;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.rayo.client.DefaultXmppConnectionFactory;
 import com.rayo.client.SimpleXmppConnection;
 import com.rayo.client.XmppConnection;
 import com.rayo.client.XmppException;
 import com.rayo.client.xmpp.extensions.Extension;
 import com.rayo.client.xmpp.stanza.Bind;
-import com.rayo.client.xmpp.stanza.IQ;
-import com.rayo.client.xmpp.stanza.XmppObject;
 import com.rayo.client.xmpp.stanza.Error.Condition;
 import com.rayo.client.xmpp.stanza.Error.Type;
+import com.rayo.client.xmpp.stanza.IQ;
+import com.rayo.client.xmpp.stanza.XmppObject;
 import com.rayo.core.AnswerCommand;
 import com.voxeo.rayo.client.internal.NettyServer;
 import com.voxeo.rayo.client.test.config.TestConfig;
@@ -37,7 +37,7 @@ public class ConnectionTest {
 	@Test
 	public void testSendFailsOnNotAuthenticated() throws Exception {
 		
-		connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);
+		connection = createConnection(TestConfig.serverEndpoint, TestConfig.port);
 		connection.connect();
 		
 		IQ iq = new IQ(IQ.Type.set)
@@ -56,7 +56,7 @@ public class ConnectionTest {
 	@Test
 	public void testSendFailsOnNotConnected() throws Exception {
 		
-		connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);
+		connection = createConnection(TestConfig.serverEndpoint, TestConfig.port);
 		
 		IQ iq = new IQ(IQ.Type.set)
 			.setChild(new Bind().setResource("clienttest"));
@@ -74,7 +74,7 @@ public class ConnectionTest {
 	@Test
 	public void testSendFailsOnNonExistentServer() throws Exception {
 		
-		connection = new SimpleXmppConnection("1234", TestConfig.port);
+		connection = createConnection("1234", TestConfig.port);
 		
 		try {
 			connection.connect();
@@ -89,7 +89,7 @@ public class ConnectionTest {
 	@Test
 	public void testWaitForWithTimeout() throws Exception {
 		
-		connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);		
+		connection = createConnection(TestConfig.serverEndpoint, TestConfig.port);		
 		connection.connect();
 		connection.login("userc", "1", "voxeo");
 		
@@ -110,7 +110,7 @@ public class ConnectionTest {
 	@Test
 	public void testWaitForDefaultTimeout() throws Exception {
 		
-		connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);		
+		connection = createConnection(TestConfig.serverEndpoint, TestConfig.port);		
 		connection.connect();
 		connection.login("userc", "1", "voxeo");
 		((SimpleXmppConnection)connection).setDefaultTimeout(100);
@@ -131,7 +131,7 @@ public class ConnectionTest {
 	@Test
 	public void testWaitForExtensionWithTimeout() throws Exception {
 		
-		connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);		
+		connection = createConnection(TestConfig.serverEndpoint, TestConfig.port);		
 		connection.connect();
 		connection.login("userc", "1", "voxeo");
 		
@@ -152,7 +152,7 @@ public class ConnectionTest {
 	@Test
 	public void testWaitForExtensionDefaultTimeout() throws Exception {
 		
-		connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);		
+		connection = createConnection(TestConfig.serverEndpoint, TestConfig.port);		
 		connection.connect();
 		connection.login("userc", "1", "voxeo");
 		((SimpleXmppConnection)connection).setDefaultTimeout(100);
@@ -175,7 +175,7 @@ public class ConnectionTest {
 	@Test
 	public void testSendAndWaitWithTimeout() throws Exception {
 		
-		connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);		
+		connection = createConnection(TestConfig.serverEndpoint, TestConfig.port);		
 		connection.connect();
 		connection.login("userc", "1", "voxeo");
 		
@@ -195,7 +195,7 @@ public class ConnectionTest {
 	@Test
 	public void testSendAndWaitWithDefaultTimeout() throws Exception {
 		
-		connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);		
+		connection = createConnection(TestConfig.serverEndpoint, TestConfig.port);		
 		connection.connect();
 		connection.login("userc", "1", "voxeo");
 		((SimpleXmppConnection)connection).setDefaultTimeout(100);
@@ -216,7 +216,7 @@ public class ConnectionTest {
 	@Test
 	public void testSendWithResponseHandler() throws Exception {
 		
-		connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);		
+		connection = createConnection(TestConfig.serverEndpoint, TestConfig.port);		
 		connection.connect();
 		connection.login("userc", "1", "voxeo");
 		
@@ -242,5 +242,10 @@ public class ConnectionTest {
 	public void shutdown() throws Exception {
 		
 		connection.disconnect();
+	}
+	
+	protected XmppConnection createConnection(String hostname, Integer port) {
+
+		return new DefaultXmppConnectionFactory().createConnection(hostname, port);
 	}
 }

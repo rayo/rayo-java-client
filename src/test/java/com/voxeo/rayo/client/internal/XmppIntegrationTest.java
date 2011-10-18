@@ -4,6 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 
 import com.rayo.client.RayoClient;
+import com.rayo.client.XmppConnection;
 import com.rayo.client.listener.RayoMessageListener;
 import com.rayo.client.xmpp.stanza.Stanza;
 import com.voxeo.rayo.client.test.config.TestConfig;
@@ -21,7 +22,7 @@ public abstract class XmppIntegrationTest {
 		
 		server = NettyServer.newInstance(TestConfig.port);
 
-		rayo = new RayoClient(TestConfig.serverEndpoint, TestConfig.port, TestConfig.serverEndpoint);
+		rayo = new RayoClient(createConnection(TestConfig.serverEndpoint, TestConfig.port), TestConfig.serverEndpoint);
 		login(username, "1", "voxeo");
 		
 		rayo.addStanzaListener(new RayoMessageListener("offer") {
@@ -37,7 +38,7 @@ public abstract class XmppIntegrationTest {
 		
 		server.sendRayoOffer();
 		// Let the offer come back and be caught by the RayoClient's listener
-		Thread.sleep(100);
+		Thread.sleep(300);
 	}
 		
 	public void assertServerReceived(String message) {
@@ -66,4 +67,6 @@ public abstract class XmppIntegrationTest {
 		
 		this.username = username;
 	}
+	
+	protected abstract XmppConnection createConnection(String hostname, Integer port);
 }

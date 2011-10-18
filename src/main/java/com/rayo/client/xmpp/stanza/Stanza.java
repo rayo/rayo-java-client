@@ -156,6 +156,12 @@ public abstract class Stanza<T extends XmppObject> extends AbstractXmppObject {
 		return (T)this;
 	}
 	
+	public T addChild(XmppObject child) {
+		
+		add(child);		
+		return (T)this;
+	}
+	
 	/**
 	 * Sets the child of this IQ object.
 	 * 

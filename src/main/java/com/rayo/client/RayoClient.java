@@ -104,6 +104,18 @@ public class RayoClient {
 	}
 	
 	/**
+	 * Creates a Rayo Client using the given XMPP connection
+	 * 
+	 * @param connection XMPP connection that will be used
+	 * @param rayoServer Rayo Sever to connect this Rayo client to
+	 */
+	public RayoClient(XmppConnection connection, String rayoServer) {
+
+		this.connection = connection;
+		this.rayoServer = rayoServer;
+	}
+	
+	/**
 	 * Connects and authenticates into the Rayo Server. By default it will use the resource 'voxeo'.
 	 * 
 	 * @param username Rayo username
@@ -1167,7 +1179,7 @@ public class RayoClient {
 			.setTo(rayoServer)
 			.setChild(new Ping());
 		try {
-			sendIQ(ping);
+			connection.send(ping);
 		} catch (XmppException e) {
 			e.printStackTrace();
 		}

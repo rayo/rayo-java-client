@@ -4,6 +4,8 @@ import java.net.URI;
 
 import org.junit.Test;
 
+import com.rayo.client.DefaultXmppConnectionFactory;
+import com.rayo.client.XmppConnection;
 import com.rayo.core.verb.VerbRef;
 import com.voxeo.rayo.client.internal.XmppIntegrationTest;
 
@@ -75,5 +77,9 @@ public class SayTest extends XmppIntegrationTest {
 		assertServerReceived("<iq id=\"*\" type=\"set\" from=\"userc@localhost/voxeo\" to=\"" + toJid +"\"><pause xmlns=\"urn:xmpp:rayo:output:1\"></pause></iq>");
 	}
 	
-	
+	@Override
+	protected XmppConnection createConnection(String hostname, Integer port) {
+
+		return new DefaultXmppConnectionFactory().createConnection(hostname, port);
+	}
 }

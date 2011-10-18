@@ -14,9 +14,12 @@ public class XmppObjectNameFilter extends AbstractXmppObjectFilter {
 	@Override
 	public AbstractXmppObject doFilter(AbstractXmppObject object) {
 
-		if (name.equalsIgnoreCase(object.getStanzaName())) {
-			return object;
+		if (object != null) {
+			if (name.equalsIgnoreCase(object.getStanzaName())) {
+				return object;
+			}
 		}
 		return null;
+			
 	}
 }

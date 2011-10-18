@@ -8,7 +8,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.rayo.client.SimpleXmppConnection;
+import com.rayo.client.DefaultXmppConnectionFactory;
 import com.rayo.client.XmppConnection;
 import com.rayo.client.filter.XmppObjectExtensionNameFilter;
 import com.rayo.client.filter.XmppObjectIdFilter;
@@ -31,7 +31,7 @@ public class XmppFilterTest {
 	@Test
 	public void testAddExtensionNameFilter() throws Exception {
 		
-		connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);		
+		connection = createConnection(TestConfig.serverEndpoint, TestConfig.port);		
 		XmppObjectExtensionNameFilter filter = new XmppObjectExtensionNameFilter("bind");
 		connection.addFilter(filter);
 		connection.connect();
@@ -43,7 +43,7 @@ public class XmppFilterTest {
 	@Test
 	public void testRemoveExtensionNameFilter() throws Exception {
 		
-		connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);
+		connection = createConnection(TestConfig.serverEndpoint, TestConfig.port);
 		
 		XmppObjectExtensionNameFilter filter = new XmppObjectExtensionNameFilter("bind");
 		filter.setDefaultTimeout(100);
@@ -58,7 +58,7 @@ public class XmppFilterTest {
 	@Test
 	public void testNotMatchedExtensionNameFilter() throws Exception {
 		
-		connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);
+		connection = createConnection(TestConfig.serverEndpoint, TestConfig.port);
 		
 		XmppObjectExtensionNameFilter filter = new XmppObjectExtensionNameFilter("bibibi");
 		filter.setDefaultTimeout(100);
@@ -73,7 +73,7 @@ public class XmppFilterTest {
 	@Test
 	public void testFilterTimeout() throws Exception {
 		
-		connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);
+		connection = createConnection(TestConfig.serverEndpoint, TestConfig.port);
 		
 		XmppObjectExtensionNameFilter filter = new XmppObjectExtensionNameFilter("bibibi");
 		connection.addFilter(filter);
@@ -90,7 +90,7 @@ public class XmppFilterTest {
 	@Test
 	public void testFilterDefaultTimeout() throws Exception {
 		
-		connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);
+		connection = createConnection(TestConfig.serverEndpoint, TestConfig.port);
 		
 		XmppObjectExtensionNameFilter filter = new XmppObjectExtensionNameFilter("bibibi");
 		filter.setDefaultTimeout(100);
@@ -108,7 +108,7 @@ public class XmppFilterTest {
 	@Test
 	public void testAddObjectNameFilter() throws Exception {
 		
-		connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);		
+		connection = createConnection(TestConfig.serverEndpoint, TestConfig.port);		
 		XmppObjectNameFilter filter = new XmppObjectNameFilter("iq");
 		connection.addFilter(filter);
 		connection.connect();
@@ -120,7 +120,7 @@ public class XmppFilterTest {
 	@Test
 	public void testRemoveObjectNameFilter() throws Exception {
 		
-		connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);
+		connection = createConnection(TestConfig.serverEndpoint, TestConfig.port);
 		
 		XmppObjectNameFilter filter = new XmppObjectNameFilter("iq");
 		filter.setDefaultTimeout(100);
@@ -135,7 +135,7 @@ public class XmppFilterTest {
 	@Test
 	public void testNotMatchedObjectNameFilter() throws Exception {
 		
-		connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);
+		connection = createConnection(TestConfig.serverEndpoint, TestConfig.port);
 		
 		XmppObjectNameFilter filter = new XmppObjectNameFilter("bibibi");
 		filter.setDefaultTimeout(100);
@@ -150,7 +150,7 @@ public class XmppFilterTest {
 	@Test
 	public void testAddObjectIdFilter() throws Exception {
 		
-		connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);		
+		connection = createConnection(TestConfig.serverEndpoint, TestConfig.port);		
 		connection.connect();
 		connection.login("userc", "1", "voxeo");
 		
@@ -166,7 +166,7 @@ public class XmppFilterTest {
 	@Test
 	public void testRemoveObjectIdFilter() throws Exception {
 		
-		connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);		
+		connection = createConnection(TestConfig.serverEndpoint, TestConfig.port);		
 		connection.connect();
 		connection.login("userc", "1", "voxeo");
 		
@@ -184,7 +184,7 @@ public class XmppFilterTest {
 	@Test
 	public void testNotMatchedObjectIdFilter() throws Exception {
 		
-		connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);		
+		connection = createConnection(TestConfig.serverEndpoint, TestConfig.port);		
 		connection.connect();
 		connection.login("userc", "1", "voxeo");
 		
@@ -202,5 +202,10 @@ public class XmppFilterTest {
 	public void shutdown() throws Exception {
 		
 		connection.disconnect();
+	}
+	
+	protected XmppConnection createConnection(String hostname, Integer port) {
+
+		return new DefaultXmppConnectionFactory().createConnection(hostname, port);
 	}
 }

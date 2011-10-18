@@ -1,5 +1,6 @@
 package com.rayo.client.io;
 
+import java.io.EOFException;
 import java.io.Reader;
 import java.net.SocketException;
 import java.util.Collection;
@@ -87,7 +88,7 @@ public class XmppReaderWorker implements Runnable {
     	filters.remove(filter);
     }  
 	
-    void resetParser(Reader reader) {
+    public void resetParser(Reader reader) {
     	
         try {
         	this.reader = reader;

@@ -6,7 +6,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.rayo.client.SimpleXmppConnection;
+import com.rayo.client.DefaultXmppConnectionFactory;
 import com.rayo.client.XmppConnection;
 import com.rayo.client.xmpp.stanza.Bind;
 import com.rayo.client.xmpp.stanza.IQ;
@@ -25,7 +25,7 @@ public class ConnectionListenerTest {
 	@Test
 	public void testRegisterConnectionListener() throws Exception {
 
-		XmppConnection connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);
+		XmppConnection connection = createConnection(TestConfig.serverEndpoint, TestConfig.port);
 		MockConnectionListener mockConnectionListener = new MockConnectionListener();
 		connection.addXmppConnectionListener(mockConnectionListener);
 		connection.connect();
@@ -44,7 +44,7 @@ public class ConnectionListenerTest {
 	@Test
 	public void testUnregisterConnectionListener() throws Exception {
 
-		XmppConnection connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);
+		XmppConnection connection = createConnection(TestConfig.serverEndpoint, TestConfig.port);
 		MockConnectionListener mockConnectionListener = new MockConnectionListener();
 		connection.addXmppConnectionListener(mockConnectionListener);
 		connection.removeXmppConnectionListener(mockConnectionListener);
@@ -63,7 +63,7 @@ public class ConnectionListenerTest {
 	@Test
 	public void testMessageSent() throws Exception {
 
-		XmppConnection connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);
+		XmppConnection connection = createConnection(TestConfig.serverEndpoint, TestConfig.port);
 		MockConnectionListener mockConnectionListener = new MockConnectionListener();
 		connection.addXmppConnectionListener(mockConnectionListener);
 		connection.connect();
@@ -79,5 +79,10 @@ public class ConnectionListenerTest {
 		
 		assertEquals(mockConnectionListener.getSent(),count+1);		
 		connection.disconnect();
+	}
+	
+	protected XmppConnection createConnection(String hostname, Integer port) {
+
+		return new DefaultXmppConnectionFactory().createConnection(hostname, port);
 	}
 }

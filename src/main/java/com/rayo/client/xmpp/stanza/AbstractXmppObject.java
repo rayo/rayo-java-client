@@ -159,6 +159,13 @@ public abstract class AbstractXmppObject implements XmppObject {
 		return (List<Element>)element.elements(childName);
 	}
 	
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<Element> getChildElements() {
+		
+		return (List<Element>)element.elements();
+	}
+	
 	
 	/**
 	 * Returns name of the first child of this XMPP object if any

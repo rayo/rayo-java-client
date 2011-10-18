@@ -18,7 +18,7 @@ import com.voxeo.rayo.client.test.util.MockStanzaListener;
 
 public class StanzaListenerTest {
 	
-	private XmppConnection connection;
+	protected XmppConnection connection;
 
 	@Before
 	public void setUp() throws Exception {
@@ -29,7 +29,7 @@ public class StanzaListenerTest {
 	@Test
 	public void testRegisterStanzaListener() throws Exception {
 
-		connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);
+		setConnection();
 		connection.connect();
 		connection.login("userc", "1", "voxeo");
 		
@@ -55,7 +55,7 @@ public class StanzaListenerTest {
 	@Test
 	public void testUnregisterStanzaListener() throws Exception {
 
-		connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);
+		setConnection();
 		connection.connect();
 		connection.login("userc", "1", "voxeo");
 		
@@ -79,5 +79,10 @@ public class StanzaListenerTest {
 	public void shutdown() throws Exception {
 
 		connection.disconnect();
+	}
+	
+	protected void setConnection() {
+		
+		connection = new SimpleXmppConnection(TestConfig.serverEndpoint, TestConfig.port);
 	}
 }

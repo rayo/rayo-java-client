@@ -64,7 +64,7 @@ public class Presence extends Stanza<Presence> {
 	
 	public Show getShow() {
 		
-		String show = value("show");
+		String show = value("show").toLowerCase();
 		if (show != null) {
 			return Show.valueOf(show);
 		}

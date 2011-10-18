@@ -20,7 +20,7 @@ public class DialSample extends BaseSample {
 	public static void main(String[] args) throws Exception {
 		
 		DialSample sample = new DialSample();
-		sample.connect("localhost", "user100", "1", "localhost");
+		sample.connect("jabber.org", "mpermar", "Voxeo2008", "telefonica115.orl.voxeo.net");
 		sample.run();
 		sample.shutdown();
 	}	

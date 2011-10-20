@@ -356,6 +356,6 @@ public class XmppReaderWorker implements Runnable {
     
     private void log(XmppObject object) {
     	
-    	System.out.println(String.format("[%s] Message from server [%s]", DateFormatUtils.format(new Date(),"hh:MM:ss.SSS"),object));
+    	System.out.println(String.format("[IN ] [%s] [%s]", DateFormatUtils.format(new Date(),"hh:MM:ss.SSS"),object));
     }
 }

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
 import javax.media.mscontrol.join.Joinable;
 
@@ -215,6 +216,7 @@ public class RayoClient {
 		connection.send(presence);
 */
 		Presence presence = new Presence()
+			.setId(UUID.randomUUID().toString())
 			.setShow(Show.chat);
 		connection.send(presence);
 

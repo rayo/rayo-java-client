@@ -41,6 +41,7 @@ import com.rayo.client.filter.XmppObjectFilter;
 import com.rayo.client.filter.XmppObjectIdFilter;
 import com.rayo.client.xmpp.stanza.Bind;
 import com.rayo.client.xmpp.stanza.IQ;
+import com.rayo.client.xmpp.stanza.IQ.Type;
 import com.rayo.client.xmpp.stanza.Session;
 import com.rayo.client.xmpp.stanza.sasl.AuthMechanism;
 
@@ -463,10 +464,13 @@ public class SASLAuthentication implements UserAuthentication {
         String userJID = bind.getJID();
 
         if (sessionSupported) {
-        	IQ iqSession = new IQ().setChild(new Session());
+        	IQ iqSession = new IQ()
+        		.setChild(new Session())
+        		.setType(Type.set);
             filter = new XmppObjectIdFilter(iqSession.getId());
             connection.addFilter(filter);
             connection.send(iqSession);
+            
             IQ ack = (IQ) filter.poll(5000);
             filter.stop();
             
@@ -477,6 +481,7 @@ public class SASLAuthentication implements UserAuthentication {
             else if (ack.getType() == IQ.Type.error) {
                 throw new XmppException(ack.getError());
             }
+            
         }
         else {
             // Server never offered session establishment

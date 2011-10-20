@@ -8,9 +8,12 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang.time.DateFormatUtils;
 
 import com.rayo.client.auth.AuthenticationHandler;
 import com.rayo.client.auth.AuthenticationListener;
@@ -195,7 +198,7 @@ public class SimpleXmppConnection implements XmppConnection {
 		if (!loggingIn && !authenticationHandler.isAuthenticated()) {
 			throw new XmppException(new Error(Condition.not_authorized, Type.cancel, "Not authenticated. You need to authenticate first."));			
 		}
-		System.out.println(String.format("Message to server: [%s]", object));
+    	System.out.println(String.format("[OUT] [%s] [%s]", DateFormatUtils.format(new Date(),"hh:MM:ss.SSS"),object));
 		writer.write(object);
 		
 		for (XmppConnectionListener listener: listeners) {

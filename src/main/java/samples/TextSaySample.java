@@ -18,7 +18,7 @@ public class TextSaySample extends BaseSample {
 	public static void main(String[] args) throws Exception {
 		
 		TextSaySample sample = new TextSaySample();
-		sample.connect("jabber.org", "mpermar", "Voxeo2008", "telefonica115.orl.voxeo.net");
+		sample.connect("go.rayo.org", "mpermar", "Voxeo2008", "telefonica116.orl.voxeo.net");
 		sample.run();
 		sample.shutdown();
 	}

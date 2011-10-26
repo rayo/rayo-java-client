@@ -27,6 +27,7 @@ import com.rayo.client.xmpp.stanza.IQ;
 import com.rayo.client.xmpp.stanza.Ping;
 import com.rayo.client.xmpp.stanza.Presence;
 import com.rayo.client.xmpp.stanza.Presence.Show;
+import com.rayo.client.xmpp.stanza.Presence.Type;
 import com.rayo.client.xmpp.stanza.Stanza;
 import com.rayo.core.AcceptCommand;
 import com.rayo.core.AnswerCommand;
@@ -208,13 +209,6 @@ public class RayoClient {
 
 	private void broadcastAvailability() throws XmppException {
 
-/*		
-		Presence presence = new Presence()
-			.setFrom(connection.getUsername() + "@" + connection.getServiceName() + "/" + connection.getResource())
-			.setTo(connection.getServiceName())
-			.setShow(Show.chat);
-		connection.send(presence);
-*/
 		Presence presence = new Presence()
 			.setId(UUID.randomUUID().toString())
 			.setShow(Show.chat);
@@ -227,6 +221,21 @@ public class RayoClient {
 			.setShow(Show.chat);
 		connection.send(presence);
 
+	}
+
+	private void broadcastUnavailability() throws XmppException {
+		
+		Presence presence = new Presence()
+			.setId(UUID.randomUUID().toString())
+			.setFrom(connection.getUsername() + "@" + connection.getServiceName() + "/" + connection.getResource())
+			.setTo(rayoServer)
+			.setType(Type.unavailable);
+		connection.send(presence);
+
+		presence = new Presence()
+			.setId(UUID.randomUUID().toString())
+			.setType(Type.unavailable);
+		connection.send(presence);
 	}
 
 	/**
@@ -284,6 +293,8 @@ public class RayoClient {
 	 * 
 	 */
 	public void disconnect() throws XmppException {
+		
+		broadcastUnavailability();
 		
 		connection.disconnect();
 	}

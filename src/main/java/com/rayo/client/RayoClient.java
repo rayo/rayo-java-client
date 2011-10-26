@@ -219,6 +219,13 @@ public class RayoClient {
 			.setId(UUID.randomUUID().toString())
 			.setShow(Show.chat);
 		connection.send(presence);
+		
+		presence = new Presence()
+			.setId(UUID.randomUUID().toString())
+			.setFrom(connection.getUsername() + "@" + connection.getServiceName() + "/" + connection.getResource())
+			.setTo(rayoServer)
+			.setShow(Show.chat);
+		connection.send(presence);
 
 	}
 
@@ -1176,14 +1183,16 @@ public class RayoClient {
 	}
 
 	private void ping() {
-		IQ ping = new IQ(IQ.Type.get)
-			.setFrom(buildFrom())
-			.setTo(rayoServer)
-			.setChild(new Ping());
-		try {
-			connection.send(ping);
-		} catch (XmppException e) {
-			e.printStackTrace();
+		if (connection.isConnected()) {
+			IQ ping = new IQ(IQ.Type.get)
+				.setFrom(buildFrom())
+				.setTo(rayoServer)
+				.setChild(new Ping());
+			try {
+				connection.send(ping);
+			} catch (XmppException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }

@@ -759,7 +759,10 @@ public class RayoClient {
 			.setTo(rayoServer)
 			.setChild(Extension.create(dial));
 		
-		return sendAndGetRef(null, iq);
+		VerbRef ref = sendAndGetRef(null, iq);
+		// dials return a call id on refs, so different than other components
+		ref.setCallId(ref.getVerbId());
+		return ref;
 	}
 
 	private VerbRef sendAndGetRef(String callId, IQ iq) throws XmppException {

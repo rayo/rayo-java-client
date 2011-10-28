@@ -171,6 +171,7 @@ public class SimpleXmppConnection implements XmppConnection {
 		// from the socket
 		// TODO: Check if implementing keep alive solves this issue
 		try {
+			System.out.println("Closing XMPP socket connection");
 			socket.close();
 		} catch (IOException e) {
 			e.printStackTrace();

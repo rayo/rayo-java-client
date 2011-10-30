@@ -115,7 +115,12 @@ public class XmppReaderWorker implements Runnable {
                     	Message message = XmppObjectParser.parseMessage(parser);
                     	log(message);
                     	for (StanzaListener listener: stanzaListeners) {
-                    		listener.onMessage(message);
+                    		try {
+                    			listener.onMessage(message);
+	                		} catch (Exception e) {
+	                			e.printStackTrace();
+	                			handleError(new Error(Condition.undefined_condition, Type.cancel, String.format("Error on client listener: %s - %s",e.getClass(),e.getMessage())));  
+	                		}                    		
                     	}
                     	filter(message);
                     } else if (parser.getName().equals("iq")) {
@@ -129,7 +134,7 @@ public class XmppReaderWorker implements Runnable {
                     			listener.onIQ(iq);
                     		} catch (Exception e) {
                     			e.printStackTrace();
-                    			handleError(new Error(Condition.undefined_condition, Type.cancel, "Error on client listener: " + e.getMessage()));  
+                    			handleError(new Error(Condition.undefined_condition, Type.cancel, String.format("Error on client listener: %s - %s",e.getClass(),e.getMessage())));  
                     		}
                     	}
                     	filter(iq);
@@ -141,7 +146,7 @@ public class XmppReaderWorker implements Runnable {
                     			listener.onPresence(presence);
 	                		} catch (Exception e) {
 	                			e.printStackTrace();
-	                			handleError(new Error(Condition.undefined_condition, Type.cancel, "Error on client listener: " + e.getMessage()));  
+                    			handleError(new Error(Condition.undefined_condition, Type.cancel, String.format("Error on client listener: %s - %s",e.getClass(),e.getMessage())));  
 	                		}
                     	}
                     	filter(presence);
@@ -245,7 +250,7 @@ public class XmppReaderWorker implements Runnable {
     			filter.filter(object);
 			} catch (Exception e) {
 				e.printStackTrace();
-				handleError(new Error(Condition.undefined_condition, Type.cancel, "Error on client filter: " + e.getMessage()));  
+    			handleError(new Error(Condition.undefined_condition, Type.cancel, String.format("Error on client filter: %s - %s",e.getClass(),e.getMessage())));  
 			}    		
     	}
 	}

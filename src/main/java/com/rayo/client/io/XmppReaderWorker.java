@@ -1,6 +1,5 @@
 package com.rayo.client.io;
 
-import java.io.EOFException;
 import java.io.Reader;
 import java.net.SocketException;
 import java.util.Collection;
@@ -19,12 +18,12 @@ import com.rayo.client.listener.StanzaListener;
 import com.rayo.client.util.XmppObjectParser;
 import com.rayo.client.xmpp.stanza.AbstractXmppObject;
 import com.rayo.client.xmpp.stanza.Error;
+import com.rayo.client.xmpp.stanza.Error.Condition;
+import com.rayo.client.xmpp.stanza.Error.Type;
 import com.rayo.client.xmpp.stanza.IQ;
 import com.rayo.client.xmpp.stanza.Message;
 import com.rayo.client.xmpp.stanza.Presence;
 import com.rayo.client.xmpp.stanza.XmppObject;
-import com.rayo.client.xmpp.stanza.Error.Condition;
-import com.rayo.client.xmpp.stanza.Error.Type;
 import com.rayo.client.xmpp.stanza.sasl.Challenge;
 import com.rayo.client.xmpp.stanza.sasl.Success;
 
@@ -126,14 +125,24 @@ public class XmppReaderWorker implements Runnable {
                     	}
                     	log(iq);
                     	for (StanzaListener listener: stanzaListeners) {
-                    		listener.onIQ(iq);
+                    		try {
+                    			listener.onIQ(iq);
+                    		} catch (Exception e) {
+                    			e.printStackTrace();
+                    			handleError(new Error(Condition.undefined_condition, Type.cancel, "Error on client listener: " + e.getMessage()));  
+                    		}
                     	}
                     	filter(iq);
                     } else if (parser.getName().equals("presence")) {
                     	Presence presence = XmppObjectParser.parsePresence(parser);
                     	log(presence);
                     	for (StanzaListener listener: stanzaListeners) {
-                    		listener.onPresence(presence);
+                    		try {
+                    			listener.onPresence(presence);
+	                		} catch (Exception e) {
+	                			e.printStackTrace();
+	                			handleError(new Error(Condition.undefined_condition, Type.cancel, "Error on client listener: " + e.getMessage()));  
+	                		}
                     	}
                     	filter(presence);
                     }
@@ -231,7 +240,13 @@ public class XmppReaderWorker implements Runnable {
     private void filter(AbstractXmppObject object) {
 
     	for (XmppObjectFilter filter: filters) {
-    		filter.filter(object);
+    		
+    		try {
+    			filter.filter(object);
+			} catch (Exception e) {
+				e.printStackTrace();
+				handleError(new Error(Condition.undefined_condition, Type.cancel, "Error on client filter: " + e.getMessage()));  
+			}    		
     	}
 	}
 
@@ -317,7 +332,11 @@ public class XmppReaderWorker implements Runnable {
     void handleError(Error e) {
     	
     	for (StanzaListener listener: stanzaListeners) {
-    		listener.onError(e);
+    		try {
+    			listener.onError(e);
+    		} catch (Exception ex) {
+    			ex.printStackTrace();
+    		}    			
     	}
     }
 

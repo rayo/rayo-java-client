@@ -814,6 +814,20 @@ public class RayoClient {
 		return sendIQ(iq);
 	}
 	
+	
+	public VerbRef input(String simpleGrammar, String callId) throws XmppException {
+		
+		Input input = new Input();
+		List<Choices> choices = new ArrayList<Choices>();
+		Choices choice = new Choices();
+		choice.setContent("yes,no");
+		choice.setContentType("application/grammar+voxeo");
+		choices.add(choice);
+		input.setGrammars(choices);
+		
+		return input(input, callId);
+	}
+	
 	public VerbRef input(Input input, String callId) throws XmppException {
 		
 		IQ iq = new IQ(IQ.Type.set)

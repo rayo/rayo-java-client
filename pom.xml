@@ -73,12 +73,12 @@
 		<dependency>
 			<groupId>org.jolokia</groupId>
 			<artifactId>jolokia-core</artifactId>
-			<version>0.95</version>
+			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jolokia</groupId>
 			<artifactId>jolokia-client-java</artifactId>
-			<version>0.95</version>
+			<version>1.0.0</version>
 		</dependency>
 
 	</dependencies>

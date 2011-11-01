@@ -1152,6 +1152,9 @@ public class RayoClient {
             .setTo(rayoServer) 
             .setChild(Extension.create(command));
         VerbRef ref = sendAndGetRef(null, iq);
+        
+		// dials return a call id on refs, so different than other components
+		ref.setCallId(ref.getVerbId());
         return ref;
 	}
 	

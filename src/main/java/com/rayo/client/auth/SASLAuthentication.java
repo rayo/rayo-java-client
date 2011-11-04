@@ -233,10 +233,11 @@ public class SASLAuthentication implements UserAuthentication {
      * @param username the username that is authenticating with the server.
      * @param resource the desired resource.
      * @param cbh the CallbackHandler used to get information from the user
+     * @param timeout how long to wait for authentication before giving up and failing
      * @return the full JID provided by the server while binding a resource to the connection.
      * @throws XMPPException if an error occures while authenticating.
      */
-    public String authenticate(String username, String resource, CallbackHandler cbh)  throws XmppException {
+    public String authenticate(String username, String resource, CallbackHandler cbh, int timeout)  throws XmppException {
     	
         // Locate the SASLMechanism to use
         String selectedMechanism = null;
@@ -279,7 +280,7 @@ public class SASLAuthentication implements UserAuthentication {
 
                 if (saslNegotiated) {
                     // Bind a resource for this connection and
-                    return bindResourceAndEstablishSession(resource);
+                    return bindResourceAndEstablishSession(resource, timeout);
                 } else {
                     // SASL authentication failed
                 }
@@ -308,10 +309,11 @@ public class SASLAuthentication implements UserAuthentication {
      * @param username the username that is authenticating with the server.
      * @param password the password to send to the server.
      * @param resource the desired resource.
+     * @param timeout how long to wait for authentication before giving up and failing
      * @return the full JID provided by the server while binding a resource to the connection.
      * @throws XMPPException if an error occures while authenticating.
      */
-    public String authenticate(String username, String password, String resource) throws XmppException {
+    public String authenticate(String username, String password, String resource, int timeout) throws XmppException {
     	
         // Locate the SASLMechanism to use
         String selectedMechanism = null;
@@ -354,12 +356,12 @@ public class SASLAuthentication implements UserAuthentication {
 
                 if (saslNegotiated) {
                     // Bind a resource for this connection and
-                    return bindResourceAndEstablishSession(resource);
+                    return bindResourceAndEstablishSession(resource, timeout);
                 }
                 else {
                     // SASL authentication failed so try a Non-SASL authentication
                     return new NonSASLAuthentication(connection)
-                            .authenticate(username, password, resource);
+                            .authenticate(username, password, resource, timeout);
                 }
             }
             catch (XmppException e) {
@@ -369,12 +371,12 @@ public class SASLAuthentication implements UserAuthentication {
                 e.printStackTrace();
                 // SASL authentication failed so try a Non-SASL authentication
                 return new NonSASLAuthentication(connection)
-                        .authenticate(username, password, resource);
+                        .authenticate(username, password, resource, timeout);
             }
         }
         else {
             // No SASL method was found so try a Non-SASL authentication
-            return new NonSASLAuthentication(connection).authenticate(username, password, resource);
+            return new NonSASLAuthentication(connection).authenticate(username, password, resource, timeout);
         }
     }
 
@@ -432,10 +434,10 @@ public class SASLAuthentication implements UserAuthentication {
         }
     }
 	*/
-    private String bindResourceAndEstablishSession(String resource) throws XmppException {
+    private String bindResourceAndEstablishSession(String resource, int timeout) throws XmppException {
 
     	try {
-			bindingLatch.await(5, TimeUnit.SECONDS);
+			bindingLatch.await(timeout, TimeUnit.SECONDS);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}

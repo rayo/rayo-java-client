@@ -294,9 +294,14 @@ public class SimpleXmppConnection implements XmppConnection {
 
 	@Override
 	public void login(String username, String password, String resourceName) throws XmppException {
+		login(username, password, resourceName, 5);
+	}
+
+	@Override
+	public void login(String username, String password, String resourceName, int timeout) throws XmppException {
 
 		loggingIn = true;
-		authenticationHandler.login(username, password, resourceName);
+		authenticationHandler.login(username, password, resourceName, timeout);
 		
 		loggingIn = false;
 		this.username = username;

@@ -48,19 +48,19 @@ class NonSASLAuthentication implements UserAuthentication {
         this.connection = connection;
     }
 
-    public String authenticate(String username, String resource, CallbackHandler cbh) throws XmppException {
+    public String authenticate(String username, String resource, CallbackHandler cbh, int timeout) throws XmppException {
     	
         //Use the callback handler to determine the password, and continue on.
         PasswordCallback pcb = new PasswordCallback("Password: ",false);
         try {
             cbh.handle(new Callback[]{pcb});
-            return authenticate(username, String.valueOf(pcb.getPassword()),resource);
+            return authenticate(username, String.valueOf(pcb.getPassword()),resource, timeout);
         } catch (Exception e) {
             throw new XmppException("Unable to determine password.",e);
         }   
     }
 
-    public String authenticate(String username, String password, String resource) throws XmppException {
+    public String authenticate(String username, String password, String resource, int timeout) throws XmppException {
     	
         // If we send an authentication packet in "get" mode with just the username,
         // the server will return the list of authentication protocols it supports.

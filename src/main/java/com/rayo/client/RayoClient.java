@@ -155,7 +155,7 @@ public class RayoClient {
 	public void connect(String username, String password, String resource, int timeout) throws XmppException {
 		
 		connection.connect(timeout);
-		connection.login(username, password, resource);
+		connection.login(username, password, resource, timeout);
 		
 		connection.addStanzaListener(new RayoMessageListener("offer") {
 			

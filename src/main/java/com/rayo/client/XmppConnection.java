@@ -12,6 +12,7 @@ public interface XmppConnection extends XmppObjectFilterSupport, AuthenticationS
 
 	public ConnectionConfiguration getConfiguration();
 	public void connect() throws XmppException;
+	public void connect(int timeout) throws XmppException;
 	public void disconnect() throws XmppException;
 	public void send(XmppObject object) throws XmppException;
 	public void send(XmppObject object, ResponseHandler handler) throws XmppException;

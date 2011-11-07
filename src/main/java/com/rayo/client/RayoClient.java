@@ -820,7 +820,7 @@ public class RayoClient {
 		Input input = new Input();
 		List<Choices> choices = new ArrayList<Choices>();
 		Choices choice = new Choices();
-		choice.setContent("yes,no");
+		choice.setContent(simpleGrammar);
 		choice.setContentType("application/grammar+voxeo");
 		choices.add(choice);
 		input.setGrammars(choices);

@@ -92,6 +92,11 @@ public class SimpleXmppConnection implements XmppConnection {
 	
 	@Override
 	public void connect() throws XmppException {
+		connect(5);
+	}
+	
+	@Override
+	public void connect(int timeout) throws XmppException {
 
         String host = config.getHostname();
         int port = config.getPort();
@@ -102,10 +107,10 @@ public class SimpleXmppConnection implements XmppConnection {
         } catch (IOException ioe) {
             throw new XmppException(String.format("Error while connecting to %s:%s",host,port), Error.Condition.service_unavailable, ioe);
         }
-        initConnection();		
+        initConnection(timeout);		
 	}
 	
-	private void initConnection() throws XmppException {
+	private void initConnection(int timeout) throws XmppException {
 
 		if (connected) {
 			return;
@@ -128,7 +133,7 @@ public class SimpleXmppConnection implements XmppConnection {
 			openStream();
 			
 			try {
-				latch.await(5, TimeUnit.SECONDS);
+				latch.await(timeout, TimeUnit.SECONDS);
 			} catch (InterruptedException e1) {
 			}
 			reader.removeXmppConnectionListener(connectionListener);
@@ -289,9 +294,14 @@ public class SimpleXmppConnection implements XmppConnection {
 
 	@Override
 	public void login(String username, String password, String resourceName) throws XmppException {
+		login(username, password, resourceName, 5);
+	}
+
+	@Override
+	public void login(String username, String password, String resourceName, int timeout) throws XmppException {
 
 		loggingIn = true;
-		authenticationHandler.login(username, password, resourceName);
+		authenticationHandler.login(username, password, resourceName, timeout);
 		
 		loggingIn = false;
 		this.username = username;

@@ -46,10 +46,11 @@ interface UserAuthentication {
      * @param resource the requested resource.
      * @param cbh the CallbackHandler used to obtain authentication ID, password, or other
      * information
+     * @param timeout how long to wait for authentication before giving up and failing
      * @return the full JID provided by the server while binding a resource for the connection.
      * @throws XMPPException if an error occurs while authenticating.
      */
-    String authenticate(String username, String resource, CallbackHandler cbh) throws XmppException;
+    String authenticate(String username, String resource, CallbackHandler cbh, int timeout) throws XmppException;
 
     /**
      * Authenticates the user with the server. This method will return the full JID provided by
@@ -62,10 +63,11 @@ interface UserAuthentication {
      * @param username the username that is authenticating with the server.
      * @param password the password to send to the server.
      * @param resource the desired resource.
+     * @param timeout how long to wait for authentication before giving up and failing
      * @return the full JID provided by the server while binding a resource for the connection.
      * @throws XMPPException if an error occures while authenticating.
      */
-    String authenticate(String username, String password, String resource) throws XmppException;
+    String authenticate(String username, String password, String resource, int timeout) throws XmppException;
 
     /**
      * Performs an anonymous authentication with the server. The server will created a new full JID

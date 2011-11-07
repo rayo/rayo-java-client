@@ -140,9 +140,22 @@ public class RayoClient {
 	 * @throws XmppException If the client is not able to connect or authenticate into the Rayo Server
 	 */
 	public void connect(String username, String password, String resource) throws XmppException {
+		connect(username, password, resource, 5);
+	}
+
+	/**
+	 * Connects and authenticates into the Rayo Server. By default it will use the resource 'voxeo'.
+	 * 
+	 * @param username Rayo username
+	 * @param password Rayo password
+	 * @param resource Resource that will be used in this communication
+	 * 
+	 * @throws XmppException If the client is not able to connect or authenticate into the Rayo Server
+	 */
+	public void connect(String username, String password, String resource, int timeout) throws XmppException {
 		
-		connection.connect();
-		connection.login(username, password, resource);
+		connection.connect(timeout);
+		connection.login(username, password, resource, timeout);
 		
 		connection.addStanzaListener(new RayoMessageListener("offer") {
 			

@@ -76,7 +76,7 @@ public class SimpleAuthenticationHandler implements AuthenticationHandler {
      * @throws IllegalStateException if not connected to the server, or already logged in
      *      to the server.
      */
-    public synchronized void login(String username, String password, String resource) throws XmppException {
+    public synchronized void login(String username, String password, String resource, int timeout) throws XmppException {
     	
         if (!connection.isConnected()) {
             throw new IllegalStateException("Not connected to server.");
@@ -89,7 +89,7 @@ public class SimpleAuthenticationHandler implements AuthenticationHandler {
 
         //String response = new NonSASLAuthentication(connection).authenticate(username, password, resource);
         userAuthentication = new SASLAuthentication(connection, authMethodsSupported);
-        String response = userAuthentication.authenticate(username, password, resource);
+        String response = userAuthentication.authenticate(username, password, resource, timeout);
         
         /*
         String response;

@@ -12,12 +12,14 @@ public interface XmppConnection extends XmppObjectFilterSupport, AuthenticationS
 
 	public ConnectionConfiguration getConfiguration();
 	public void connect() throws XmppException;
+	public void connect(int timeout) throws XmppException;
 	public void disconnect() throws XmppException;
 	public void send(XmppObject object) throws XmppException;
 	public void send(XmppObject object, ResponseHandler handler) throws XmppException;
 	public XmppObject sendAndWait(XmppObject object) throws XmppException;
 	public XmppObject sendAndWait(XmppObject object, int timeout) throws XmppException;
 	public void login(String username, String password, String resourceName) throws XmppException;
+	public void login(String username, String password, String resourceName, int timeout) throws XmppException;
 
 	public String getConnectionId();
 	public String getServiceName();

@@ -14,6 +14,7 @@ import javax.media.mscontrol.join.Joinable;
 import org.joda.time.Duration;
 
 import com.rayo.client.auth.AuthenticationListener;
+import com.rayo.client.exception.DialTimeoutException;
 import com.rayo.client.filter.XmppObjectFilter;
 import com.rayo.client.listener.RayoMessageListener;
 import com.rayo.client.listener.StanzaListener;
@@ -773,6 +774,9 @@ public class RayoClient {
 			.setChild(Extension.create(dial));
 		
 		VerbRef ref = sendAndGetRef(null, iq);
+		if (ref == null) {
+			throw new DialTimeoutException();
+		}
 		// dials return a call id on refs, so different than other components
 		ref.setCallId(ref.getVerbId());
 		return ref;
@@ -1166,6 +1170,9 @@ public class RayoClient {
             .setChild(Extension.create(command));
         VerbRef ref = sendAndGetRef(null, iq);
         
+        if (ref == null) {
+        	throw new DialTimeoutException();
+        }
 		// dials return a call id on refs, so different than other components
 		ref.setCallId(ref.getVerbId());
         return ref;

@@ -204,7 +204,7 @@ public class SimpleXmppConnection implements XmppConnection {
 		if (!loggingIn && !authenticationHandler.isAuthenticated()) {
 			throw new XmppException(new Error(Condition.not_authorized, Type.cancel, "Not authenticated. You need to authenticate first."));			
 		}
-    	System.out.println(String.format("[OUT] [%s] [%s]", DateFormatUtils.format(new Date(),"hh:MM:ss.SSS"),object));
+    	System.out.println(String.format("[OUT] [%s] [%s]", DateFormatUtils.format(new Date(),"hh:mm:ss.SSS"),object));
 		writer.write(object);
 		
 		for (XmppConnectionListener listener: listeners) {

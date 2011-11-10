@@ -3,10 +3,8 @@ package com.rayo.client.io;
 import java.io.Reader;
 import java.net.SocketException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.apache.commons.lang.time.DateFormatUtils;
 import org.xmlpull.mxp1.MXParser;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -161,6 +159,7 @@ public class XmppReaderWorker implements Runnable {
                                 if (parser.getAttributeName(i).equals("id")) {
                                     // Save the connectionID
                                 	connectionId = parser.getAttributeValue(i);
+                                	log("Received connection stream. Id: " + connectionId);
                                     if (!"1.0".equals(parser.getAttributeValue("", "version"))) {
                                         // Notify that a stream has been opened if the
                                         // server is not XMPP 1.0 compliant otherwise make the
@@ -380,6 +379,11 @@ public class XmppReaderWorker implements Runnable {
     
     private void log(XmppObject object) {
     	
-    	System.out.println(String.format("[IN ] [%s] [%s]", DateFormatUtils.format(new Date(),"hh:mm:ss.SSS"),object));
+    	log(object.toString());
+    }
+    
+    private void log(String value) {
+    	
+    	System.out.println(value);
     }
 }

@@ -5,6 +5,8 @@ import java.net.SocketException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.xmlpull.mxp1.MXParser;
@@ -40,6 +42,13 @@ public class XmppReaderWorker implements Runnable {
 	private Collection<StanzaListener> stanzaListeners = new ConcurrentLinkedQueue<StanzaListener>();
 	private Collection<AuthenticationListener> authListeners = new ConcurrentLinkedQueue<AuthenticationListener>();
 	private Collection<XmppObjectFilter> filters = new ConcurrentLinkedQueue<XmppObjectFilter>();
+	
+	private ExecutorService executorService;
+	
+	public XmppReaderWorker() {
+		
+		executorService = Executors.newCachedThreadPool();
+	}
 	
 	@Override
 	public void run() {
@@ -112,42 +121,57 @@ public class XmppReaderWorker implements Runnable {
             do {
                 if (eventType == XmlPullParser.START_TAG) {
                     if (parser.getName().equals("message")) {
-                    	Message message = XmppObjectParser.parseMessage(parser);
+                    	final Message message = XmppObjectParser.parseMessage(parser);
                     	log(message);
-                    	for (StanzaListener listener: stanzaListeners) {
-                    		try {
-                    			listener.onMessage(message);
-	                		} catch (Exception e) {
-	                			e.printStackTrace();
-	                			handleError(new Error(Condition.undefined_condition, Type.cancel, String.format("Error on client listener: %s - %s",e.getClass(),e.getMessage())));  
-	                		}                    		
+                    	for (final StanzaListener listener: stanzaListeners) {
+            	    		executorService.execute(new Runnable() {								
+            					@Override
+            					public void run() {
+                            		try {
+                            			listener.onMessage(message);
+        	                		} catch (Exception e) {
+        	                			e.printStackTrace();
+        	                			handleError(new Error(Condition.undefined_condition, Type.cancel, String.format("Error on client listener: %s - %s",e.getClass(),e.getMessage())));  
+        	                		}                    		
+            					}
+            				});                    		
                     	}
                     	filter(message);
                     } else if (parser.getName().equals("iq")) {
-                    	IQ iq = XmppObjectParser.parseIQ(parser);
+                    	final IQ iq = XmppObjectParser.parseIQ(parser);
                     	if (iq.hasChild("error")) {
                     		handleError(iq.getError());
                     	}
                     	log(iq);
-                    	for (StanzaListener listener: stanzaListeners) {
-                    		try {
-                    			listener.onIQ(iq);
-                    		} catch (Exception e) {
-                    			e.printStackTrace();
-                    			handleError(new Error(Condition.undefined_condition, Type.cancel, String.format("Error on client listener: %s - %s",e.getClass(),e.getMessage())));  
-                    		}
-                    	}
+                    	for (final StanzaListener listener: stanzaListeners) {
+            	    		executorService.execute(new Runnable() {								
+            					@Override
+            					public void run() {
+                            		try {
+                            			listener.onIQ(iq);
+                            		} catch (Exception e) {
+                            			e.printStackTrace();
+                            			handleError(new Error(Condition.undefined_condition, Type.cancel, String.format("Error on client listener: %s - %s",e.getClass(),e.getMessage())));  
+                            		}                 		
+            					}
+            				});                    		
+                    	}                    	
                     	filter(iq);
                     } else if (parser.getName().equals("presence")) {
-                    	Presence presence = XmppObjectParser.parsePresence(parser);
+                    	final Presence presence = XmppObjectParser.parsePresence(parser);
                     	log(presence);
-                    	for (StanzaListener listener: stanzaListeners) {
-                    		try {
-                    			listener.onPresence(presence);
-	                		} catch (Exception e) {
-	                			e.printStackTrace();
-                    			handleError(new Error(Condition.undefined_condition, Type.cancel, String.format("Error on client listener: %s - %s",e.getClass(),e.getMessage())));  
-	                		}
+                    	for (final StanzaListener listener: stanzaListeners) {
+            	    		executorService.execute(new Runnable() {								
+            					@Override
+            					public void run() {
+                            		try {
+                            			listener.onPresence(presence);
+        	                		} catch (Exception e) {
+        	                			e.printStackTrace();
+                            			handleError(new Error(Condition.undefined_condition, Type.cancel, String.format("Error on client listener: %s - %s",e.getClass(),e.getMessage())));  
+        	                		}                   		
+            					}
+            				});                    		
                     	}
                     	filter(presence);
                     }
@@ -192,24 +216,40 @@ public class XmppReaderWorker implements Runnable {
 
                     }
                     else if (parser.getName().equals("challenge")) {
-                    	Challenge challenge = new Challenge().setText(parser.nextText());
-                    	for (AuthenticationListener listener: authListeners) {
-                    		listener.authChallenge(challenge);
+                    	final Challenge challenge = new Challenge().setText(parser.nextText());
+                    	for (final AuthenticationListener listener: authListeners) {
+	        	    		executorService.execute(new Runnable() {
+	        	    			@Override
+	        	    			public void run() {
+	                	    		listener.authChallenge(challenge);
+	        	    			}
+	        	    		});
                     	}
                     }
                     else if (parser.getName().equals("success")) {
-                    	Success success = new Success().setText(parser.nextText());
+                    	final Success success = new Success().setText(parser.nextText());
                     	log(success);
-                    	for (AuthenticationListener listener: authListeners) {
-                    		listener.authSuccessful(success);
+                    	for (final AuthenticationListener listener: authListeners) {
+            	    		executorService.execute(new Runnable() {
+            	    			@Override
+            	    			public void run() {
+                    	    		listener.authSuccessful(success);
+            	    			}
+            	    		});                    		
                     	}
                     	
                     	filter(success);
 
                     	// We now need to bind a resource for the connection
                         // Open a new stream and wait for the response
-                    	for (XmppConnectionListener listener: listeners) {
-                    		listener.connectionReset(connectionId);
+                    	for (final XmppConnectionListener listener: listeners) {
+            	    		executorService.execute(new Runnable() {								
+								@Override
+								public void run() {
+		            	    		listener.connectionReset(connectionId);									
+								}
+							});
+                    		
                     	}
 
                         // Reset the state of the parser since a new stream element is going
@@ -224,8 +264,13 @@ public class XmppReaderWorker implements Runnable {
                 else if (eventType == XmlPullParser.END_TAG) {
                     if (parser.getName().equals("stream")) {
                         // Disconnect the connection
-            	    	for (XmppConnectionListener listener: listeners) {
-            	    		listener.connectionFinished(connectionId);
+            	    	for (final XmppConnectionListener listener: listeners) {
+            	    		executorService.execute(new Runnable() {								
+								@Override
+								public void run() {
+		            	    		listener.connectionFinished(connectionId);									
+								}
+							});
             	    	}
                     }
                 }
@@ -243,17 +288,21 @@ public class XmppReaderWorker implements Runnable {
     }
 
 
-    private void filter(AbstractXmppObject object) {
+    private void filter(final AbstractXmppObject object) {
 
-    	for (XmppObjectFilter filter: filters) {
-    		
-    		try {
-    			filter.filter(object);
-			} catch (Exception e) {
-				e.printStackTrace();
-    			handleError(new Error(Condition.undefined_condition, Type.cancel, String.format("Error on client filter: %s - %s",e.getClass(),e.getMessage())));  
-			}    		
-    	}
+		executorService.execute(new Runnable() {								
+			@Override
+			public void run() {
+		    	for (XmppObjectFilter filter: filters) {		    		
+		    		try {
+		    			filter.filter(object);
+					} catch (Exception e) {
+						e.printStackTrace();
+		    			handleError(new Error(Condition.undefined_condition, Type.cancel, String.format("Error on client filter: %s - %s",e.getClass(),e.getMessage())));  
+					}    		
+		    	}                  		
+			}
+		}); 
 	}
 
 	private void parseFeatures(XmlPullParser parser) throws Exception {
@@ -272,19 +321,35 @@ public class XmppReaderWorker implements Runnable {
                     // The server is reporting available SASL mechanisms. Store this information
                     // which will be used later while logging (i.e. authenticating) into
                     // the server
-                	Collection<String> mechanisms = XmppObjectParser.parseMechanisms(parser);
-        	    	for (AuthenticationListener listener: authListeners) {
-        	    		listener.authSettingsReceived(mechanisms);
+                	final Collection<String> mechanisms = XmppObjectParser.parseMechanisms(parser);
+        	    	for (final AuthenticationListener listener: authListeners) {
+        	    		executorService.execute(new Runnable() {
+        	    			@Override
+        	    			public void run() {
+                	    		listener.authSettingsReceived(mechanisms);
+        	    			}
+        	    		});
         	    	}
                 }
                 else if (parser.getName().equals("bind")) {
-        	    	for (AuthenticationListener listener: authListeners) {
-        	    		listener.authBindingRequired();
+                	
+        	    	for (final AuthenticationListener listener: authListeners) {
+        	    		executorService.execute(new Runnable() {
+        	    			@Override
+        	    			public void run() {
+                	    		listener.authBindingRequired();
+        	    			}
+        	    		});        	    	
         	    	}
                 }
                 else if (parser.getName().equals("session")) {
-        	    	for (AuthenticationListener listener: authListeners) {
-        	    		listener.authSessionsSupported();
+        	    	for (final AuthenticationListener listener: authListeners) {
+        	    		executorService.execute(new Runnable() {
+        	    			@Override
+        	    			public void run() {
+                	    		listener.authSessionsSupported();
+        	    			}
+        	    		}); 
         	    	}
                 }
                 else if (parser.getName().equals("compression")) {
@@ -320,8 +385,13 @@ public class XmppReaderWorker implements Runnable {
     private void connectionEstablished() {
     	
     	if (connectionId != null) {
-	    	for (XmppConnectionListener listener: listeners) {
-	    		listener.connectionEstablished(connectionId);
+	    	for (final XmppConnectionListener listener: listeners) {
+	    		executorService.execute(new Runnable() {								
+					@Override
+					public void run() {
+        	    		listener.connectionEstablished(connectionId);									
+					}
+				});
 	    	}
     	}
     }
@@ -329,8 +399,13 @@ public class XmppReaderWorker implements Runnable {
     private void connectionFinished() {
     	
     	if (connectionId != null) {
-	    	for (XmppConnectionListener listener: listeners) {
-	    		listener.connectionFinished(connectionId);
+	    	for (final XmppConnectionListener listener: listeners) {
+	    		executorService.execute(new Runnable() {								
+					@Override
+					public void run() {
+        	    		listener.connectionFinished(connectionId);									
+					}
+				});	    		
 	    	}
     	}
     }

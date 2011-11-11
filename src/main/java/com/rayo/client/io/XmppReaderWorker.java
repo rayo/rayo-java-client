@@ -98,6 +98,7 @@ public class XmppReaderWorker implements Runnable {
 	
     public void resetParser(Reader reader) {
     	
+    	log("Reseting parser");
         try {
         	this.reader = reader;
             parser = new MXParser();

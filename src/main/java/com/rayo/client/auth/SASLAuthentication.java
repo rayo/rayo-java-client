@@ -451,6 +451,7 @@ public class SASLAuthentication implements UserAuthentication {
             // Server never offered resource binding
         	System.out.println(String.format("[%s] Bind not received on SASLAuthentication instance [%s]", DateFormatUtils.format(new Date(),"hh:mm:ss.SSS"), this));                	
         	System.out.println("Count down latch: " + bindingLatch.getCount());
+        	printStacktraces();
         	throw new XmppException("Resource binding not offered by server");
         }
 
@@ -596,4 +597,15 @@ public class SASLAuthentication implements UserAuthentication {
         resourceBinded = false;
         sessionSupported = false;
     }
+    
+    public void printStacktraces() {
+		
+    	for (Map.Entry<Thread, StackTraceElement[]> entry: Thread.getAllStackTraces().entrySet()) {
+    		System.out.println("Thread name: " + entry.getKey());
+    		for (StackTraceElement trace: entry.getValue()) {
+    			System.out.println(trace.toString());
+    		}
+    		System.out.println("....................................");
+    	}
+	}
 }

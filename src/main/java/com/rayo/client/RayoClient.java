@@ -239,8 +239,10 @@ public class RayoClient {
 			} else {
 				System.out.println("[ERROR] Trying to connect while the old XMPP connection is active. Please, disconnect first");
 			}
-		} finally {
 			System.out.println("[INFO] Rayo client is now connected");
+		} catch (Exception e) {
+			System.out.println("[ERROR] Error while trying to opean an XMPP connection");
+		} finally {
 			lock.unlock();
 		}
 	}

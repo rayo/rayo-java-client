@@ -159,6 +159,7 @@ public class RayoClient {
 	 */
 	public void connect(String username, String password, String resource, int timeout) throws XmppException {
 		
+		System.out.println("Connecting with Rayo Client instance: " + this);
 		Lock lock = connectionLock.writeLock();
 		lock.lock();
 		

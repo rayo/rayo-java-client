@@ -321,7 +321,7 @@ public class SASLAuthentication implements UserAuthentication {
     	
         // Locate the SASLMechanism to use
         String selectedMechanism = null;
-        System.out.println("Checking mechanisms. Preferences: " + mechanismsPreferences + ". Implemented: " + implementedMechanisms);
+        System.out.println("Checking mechanisms. Preferences: " + mechanismsPreferences + ". Implemented: " + implementedMechanisms + ". Server methods: " + serverMethods);
         for (String mechanism : mechanismsPreferences) {
             if (implementedMechanisms.containsKey(mechanism) &&
             		serverMethods.contains(mechanism)) {

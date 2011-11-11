@@ -308,9 +308,11 @@ public class RayoClient {
 	 */
 	public void disconnect() throws XmppException {
 		
-		broadcastUnavailability();
-		
-		connection.disconnect();
+		if (connection.isConnected()) {
+			broadcastUnavailability();
+			
+			connection.disconnect();
+		}
 	}
 	
 	

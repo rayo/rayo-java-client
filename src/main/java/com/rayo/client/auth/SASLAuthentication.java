@@ -25,6 +25,7 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.callback.CallbackHandler;
+
+import org.apache.commons.lang.time.DateFormatUtils;
 
 import com.rayo.client.XmppConnection;
 import com.rayo.client.XmppException;
@@ -446,8 +449,9 @@ public class SASLAuthentication implements UserAuthentication {
     	
         if (!resourceBinded) {
             // Server never offered resource binding
-        	System.out.println(String.format("Bind not received on SASLAuthentication instance [%s]", this));                	
-            throw new XmppException("Resource binding not offered by server");
+        	System.out.println(String.format("[%s] Bind not received on SASLAuthentication instance [%s]", DateFormatUtils.format(new Date(),"hh:mm:ss.SSS"), this));                	
+        	System.out.println("Count down latch: " + bindingLatch.getCount());
+        	throw new XmppException("Resource binding not offered by server");
         }
 
         IQ iqBind = new IQ(IQ.Type.set,new Bind().setResource(resource));

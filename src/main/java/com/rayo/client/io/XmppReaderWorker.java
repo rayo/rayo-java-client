@@ -257,8 +257,9 @@ public class XmppReaderWorker implements Runnable {
                 if (parser == null) {
                 	log("Parser is null. Exiting.");
                 	done = true;
+                } else {
+                	eventType = parser.next();
                 }
-                eventType = parser.next();
             } while (!done && eventType != XmlPullParser.END_DOCUMENT);
         } catch (SocketException se) {
         	if (!done) {

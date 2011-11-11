@@ -446,6 +446,7 @@ public class SASLAuthentication implements UserAuthentication {
     	
         if (!resourceBinded) {
             // Server never offered resource binding
+        	System.out.println(String.format("Bind not received on SASLAuthentication instance [%s]", this));                	
             throw new XmppException("Resource binding not offered by server");
         }
 
@@ -563,6 +564,7 @@ public class SASLAuthentication implements UserAuthentication {
      */
     public void bindingRequired() {
 
+    	System.out.println(String.format("Receiveded bind on SASLAuthentication instance [%s]", this));                	
     	resourceBinded = true;
     	bindingLatch.countDown();
     }

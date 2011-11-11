@@ -336,9 +336,11 @@ public class XmppReaderWorker implements Runnable {
                 else if (parser.getName().equals("bind")) {
                 	log("Received bind");                	
         	    	for (final AuthenticationListener listener: authListeners) {
+                    	log("Sending bind task to executors");                	
         	    		executorService.execute(new Runnable() {
         	    			@Override
         	    			public void run() {
+        	                	log("Calling authentication listener");                	
                 	    		listener.authBindingRequired();
         	    			}
         	    		});        	    	

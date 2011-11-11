@@ -171,6 +171,7 @@ public class RayoClient {
 		}		
 		
 		try {
+			System.out.println("[INFO] Connecting Rayo client XMPP Connection");
 			if (!connection.isConnected()) {
 				connection.connect(timeout);
 				connection.login(username, password, resource, timeout);
@@ -239,6 +240,7 @@ public class RayoClient {
 				System.out.println("[ERROR] Trying to connect while the old XMPP connection is active. Please, disconnect first");
 			}
 		} finally {
+			System.out.println("[INFO] Rayo client is now connected");
 			lock.unlock();
 		}
 	}
@@ -363,12 +365,14 @@ public class RayoClient {
 		Lock lock = connectionLock.writeLock();
 		lock.lock();
 		try {
+			System.out.println("[INFO] Disconnecting Rayo client XMPP Connection");
 			if (connection.isConnected()) {
 				broadcastUnavailability();
 				
 				connection.disconnect();
 			}
 		} finally {
+			System.out.println("[INFO] Rayo Client XMPP Connection has been disconnected");
 			lock.unlock();
 		}
 	}

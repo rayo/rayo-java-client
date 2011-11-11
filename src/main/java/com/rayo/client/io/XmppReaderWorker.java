@@ -207,6 +207,7 @@ public class XmppReaderWorker implements Runnable {
                     	handleError(error);
                     }
                     else if (parser.getName().equals("features")) {
+                    	log("Received features");
                     	parseFeatures(parser);
                     }
                     else if (parser.getName().equals("proceed")) {
@@ -318,6 +319,7 @@ public class XmppReaderWorker implements Runnable {
                     startTLSReceived = true;
                 }
                 else if (parser.getName().equals("mechanisms")) {
+                	log("Received mechanisms");
                     // The server is reporting available SASL mechanisms. Store this information
                     // which will be used later while logging (i.e. authenticating) into
                     // the server
@@ -332,7 +334,7 @@ public class XmppReaderWorker implements Runnable {
         	    	}
                 }
                 else if (parser.getName().equals("bind")) {
-                	
+                	log("Received bind");                	
         	    	for (final AuthenticationListener listener: authListeners) {
         	    		executorService.execute(new Runnable() {
         	    			@Override
@@ -343,6 +345,7 @@ public class XmppReaderWorker implements Runnable {
         	    	}
                 }
                 else if (parser.getName().equals("session")) {
+                	log("Received session");
         	    	for (final AuthenticationListener listener: authListeners) {
         	    		executorService.execute(new Runnable() {
         	    			@Override

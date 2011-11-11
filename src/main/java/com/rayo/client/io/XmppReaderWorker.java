@@ -219,24 +219,14 @@ public class XmppReaderWorker implements Runnable {
                     else if (parser.getName().equals("challenge")) {
                     	final Challenge challenge = new Challenge().setText(parser.nextText());
                     	for (final AuthenticationListener listener: authListeners) {
-	        	    		executorService.execute(new Runnable() {
-	        	    			@Override
-	        	    			public void run() {
-	                	    		listener.authChallenge(challenge);
-	        	    			}
-	        	    		});
+	                	    listener.authChallenge(challenge);
                     	}
                     }
                     else if (parser.getName().equals("success")) {
                     	final Success success = new Success().setText(parser.nextText());
                     	log(success);
                     	for (final AuthenticationListener listener: authListeners) {
-            	    		executorService.execute(new Runnable() {
-            	    			@Override
-            	    			public void run() {
-                    	    		listener.authSuccessful(success);
-            	    			}
-            	    		});                    		
+                    	    listener.authSuccessful(success);
                     	}
                     	
                     	filter(success);
@@ -329,36 +319,19 @@ public class XmppReaderWorker implements Runnable {
                     // the server
                 	final Collection<String> mechanisms = XmppObjectParser.parseMechanisms(parser);
         	    	for (final AuthenticationListener listener: authListeners) {
-        	    		executorService.execute(new Runnable() {
-        	    			@Override
-        	    			public void run() {
-                	    		listener.authSettingsReceived(mechanisms);
-        	    			}
-        	    		});
+                	    listener.authSettingsReceived(mechanisms);
         	    	}
                 }
                 else if (parser.getName().equals("bind")) {
                 	log("Received bind");                	
         	    	for (final AuthenticationListener listener: authListeners) {
-                    	log("Sending bind task to executors");                	
-        	    		executorService.execute(new Runnable() {
-        	    			@Override
-        	    			public void run() {
-        	                	log("Calling authentication listener");                	
-                	    		listener.authBindingRequired();
-        	    			}
-        	    		});        	    	
+        	    		listener.authBindingRequired();
         	    	}
                 }
                 else if (parser.getName().equals("session")) {
                 	log("Received session");
         	    	for (final AuthenticationListener listener: authListeners) {
-        	    		executorService.execute(new Runnable() {
-        	    			@Override
-        	    			public void run() {
-                	    		listener.authSessionsSupported();
-        	    			}
-        	    		}); 
+                	    listener.authSessionsSupported();
         	    	}
                 }
                 else if (parser.getName().equals("compression")) {

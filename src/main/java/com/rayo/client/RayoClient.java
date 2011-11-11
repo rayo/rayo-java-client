@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.media.mscontrol.join.Joinable;
 
@@ -83,6 +85,8 @@ public class RayoClient {
 	
 	private String rayoServer;
 	
+	private ReentrantReadWriteLock connectionLock = new ReentrantReadWriteLock();
+	
 	/**
 	 * Creates a new client object. This object will be used to interact with an Rayo server.
 	 * 
@@ -155,70 +159,88 @@ public class RayoClient {
 	 */
 	public void connect(String username, String password, String resource, int timeout) throws XmppException {
 		
-		connection.connect(timeout);
-		connection.login(username, password, resource, timeout);
+		Lock lock = connectionLock.writeLock();
+		lock.lock();
 		
-		connection.addStanzaListener(new RayoMessageListener("offer") {
-			
-			@Override
-			@SuppressWarnings("rawtypes")
-			public void messageReceived(Object object) {
+		if (connection.isConnected()) {
+			try {
+				disconnect();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}		
+		
+		try {
+			if (!connection.isConnected()) {
+				connection.connect(timeout);
+				connection.login(username, password, resource, timeout);
 				
-				//TODO: Stanza should have methods to fetch the JID node name, domain, etc.
-				Stanza stanza = (Stanza)object;
-				int at = stanza.getFrom().indexOf('@');
-				String callId = stanza.getFrom().substring(0, at);
-				String domain = stanza.getFrom().substring(at+1);
-				if (domain.contains(":")) {
-					domain = domain.substring(0, domain.indexOf(':'));
-				}
-				Call call = new Call(callId, domain);
-				callRegistry.registerCall(callId, call);
-			}
-		});
-		connection.addStanzaListener(new RayoMessageListener("end") {
-			
-			@Override
-			@SuppressWarnings("rawtypes")
-			public void messageReceived(Object object) {
-				
-				//TODO: Stanza should have methods to fetch the JID node name, domain, etc.
-				Stanza stanza = (Stanza)object;
-				int at = stanza.getFrom().indexOf('@');
-				String callId = stanza.getFrom().substring(0, at);
-				callRegistry.unregisterCal(callId);
-			}
-		});	
-		
-		broadcastAvailability();
-		
-		TimerTask pingTask = new TimerTask() {
-			
-			@Override
-			public void run() {
-
-				ping();
-			}
-		};
-		new Timer().schedule(pingTask, 5000, 30000);
-		
-		connection.addStanzaListener(new RayoMessageListener("ping") {
-			
-			@Override
-			public void messageReceived(Object object) {
-
-				IQ iq = (IQ)object;
-				if (!iq.isError()) {
-					// pong
-					try {
-						sendIQ(iq.result());
-					} catch (XmppException e) {
-						e.printStackTrace();
+				connection.addStanzaListener(new RayoMessageListener("offer") {
+					
+					@Override
+					@SuppressWarnings("rawtypes")
+					public void messageReceived(Object object) {
+						
+						//TODO: Stanza should have methods to fetch the JID node name, domain, etc.
+						Stanza stanza = (Stanza)object;
+						int at = stanza.getFrom().indexOf('@');
+						String callId = stanza.getFrom().substring(0, at);
+						String domain = stanza.getFrom().substring(at+1);
+						if (domain.contains(":")) {
+							domain = domain.substring(0, domain.indexOf(':'));
+						}
+						Call call = new Call(callId, domain);
+						callRegistry.registerCall(callId, call);
 					}
-				}
-			}
-		});
+				});
+				connection.addStanzaListener(new RayoMessageListener("end") {
+					
+					@Override
+					@SuppressWarnings("rawtypes")
+					public void messageReceived(Object object) {
+						
+						//TODO: Stanza should have methods to fetch the JID node name, domain, etc.
+						Stanza stanza = (Stanza)object;
+						int at = stanza.getFrom().indexOf('@');
+						String callId = stanza.getFrom().substring(0, at);
+						callRegistry.unregisterCal(callId);
+					}
+				});	
+				
+				broadcastAvailability();
+				
+				TimerTask pingTask = new TimerTask() {
+					
+					@Override
+					public void run() {
 		
+						ping();
+					}
+				};
+				new Timer().schedule(pingTask, 5000, 30000);
+				
+				connection.addStanzaListener(new RayoMessageListener("ping") {
+					
+					@Override
+					public void messageReceived(Object object) {
+		
+						IQ iq = (IQ)object;
+						if (!iq.isError()) {
+							// pong
+							try {
+								sendIQ(iq.result());
+							} catch (XmppException e) {
+								e.printStackTrace();
+							}
+						}
+					}
+				});
+			} else {
+				System.out.println("[ERROR] Trying to connect while the old XMPP connection is active. Please, disconnect first");
+			}
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	private void broadcastAvailability() throws XmppException {
@@ -259,7 +281,13 @@ public class RayoClient {
 	 */
 	public void addStanzaListener(StanzaListener listener) {
 		
-		connection.addStanzaListener(listener);
+		Lock lock = connectionLock.readLock();
+		lock.lock();
+		try {
+			connection.addStanzaListener(listener);
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	/**
@@ -268,8 +296,14 @@ public class RayoClient {
 	 * @param listener Stanza Callback to be removed
 	 */
 	public void removeStanzaListener(StanzaListener listener) {
-		
-		connection.removeStanzaListener(listener);
+
+		Lock lock = connectionLock.readLock();
+		lock.lock();
+		try {
+			connection.removeStanzaListener(listener);
+		} finally {
+			lock.unlock();
+		}
 	}
 	
 	/**
@@ -279,7 +313,13 @@ public class RayoClient {
 	 */
 	public void addAuthenticationListener(AuthenticationListener listener) {
 		
-		connection.addAuthenticationListener(listener);
+		Lock lock = connectionLock.readLock();
+		lock.lock();
+		try {
+			connection.addAuthenticationListener(listener);
+		} finally {
+			lock.unlock();
+		}
 	}
 	
 	/**
@@ -289,7 +329,13 @@ public class RayoClient {
 	 */
 	public void addFilter(XmppObjectFilter filter) {
 		
-		connection.addFilter(filter);
+		Lock lock = connectionLock.readLock();
+		lock.lock();
+		try {
+			connection.addFilter(filter);
+		} finally {
+			lock.unlock();
+		}
 	}
 	
 	/**
@@ -298,8 +344,14 @@ public class RayoClient {
 	 * @param filter Filter object to be removed
 	 */
 	public void removeFilter(XmppObjectFilter filter) {
-		
-		connection.removeFilter(filter);
+
+		Lock lock = connectionLock.readLock();
+		lock.lock();
+		try {
+			connection.removeFilter(filter);
+		} finally {
+			lock.unlock();
+		}
 	}
 	
 	/**
@@ -308,10 +360,16 @@ public class RayoClient {
 	 */
 	public void disconnect() throws XmppException {
 		
-		if (connection.isConnected()) {
-			broadcastUnavailability();
-			
-			connection.disconnect();
+		Lock lock = connectionLock.writeLock();
+		lock.lock();
+		try {
+			if (connection.isConnected()) {
+				broadcastUnavailability();
+				
+				connection.disconnect();
+			}
+		} finally {
+			lock.unlock();
 		}
 	}
 	
@@ -377,8 +435,14 @@ public class RayoClient {
 	 */
 	public Object waitFor(String rayoMessage) throws XmppException {
 		
-		Extension extension = (Extension)connection.waitForExtension(rayoMessage);
-		return extension.getObject();
+		Lock lock = connectionLock.readLock();
+		lock.lock();
+		try {
+			Extension extension = (Extension)connection.waitForExtension(rayoMessage);
+			return extension.getObject();
+		} finally {
+			lock.unlock();
+		}
 	}
 	
 	/**
@@ -395,9 +459,15 @@ public class RayoClient {
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> T waitFor(String rayoMessage, Class<T> clazz) throws XmppException {
-		
-		Extension extension = (Extension)connection.waitForExtension(rayoMessage);
-		return (T)extension.getObject();
+
+		Lock lock = connectionLock.readLock();
+		lock.lock();
+		try {
+			Extension extension = (Extension)connection.waitForExtension(rayoMessage);
+			return (T)extension.getObject();
+		} finally {
+			lock.unlock();
+		}
 	}
 	
 	/**
@@ -415,9 +485,15 @@ public class RayoClient {
 	 * @throws XmppException If there is any problem waiting for the message
 	 */
 	public Object waitFor(String extensionName, int timeout) throws XmppException {
-		
-		Extension extension = (Extension)connection.waitForExtension(extensionName, timeout);
-		return extension.getObject();
+
+		Lock lock = connectionLock.readLock();
+		lock.lock();
+		try {
+			Extension extension = (Extension)connection.waitForExtension(extensionName, timeout);
+			return extension.getObject();
+		} finally {
+			lock.unlock();
+		}
 	}
 	
 	/**
@@ -437,9 +513,15 @@ public class RayoClient {
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> T waitFor(String extensionName, Class<T> clazz, Integer timeout) throws XmppException {
-		
-		Extension extension = (Extension)connection.waitForExtension(extensionName, timeout);
-		return (T)extension.getObject();
+
+		Lock lock = connectionLock.readLock();
+		lock.lock();
+		try {
+			Extension extension = (Extension)connection.waitForExtension(extensionName, timeout);
+			return (T)extension.getObject();
+		} finally {
+			lock.unlock();
+		}
 	}
 	
 	/**
@@ -786,18 +868,24 @@ public class RayoClient {
 
 	private VerbRef sendAndGetRef(String callId, IQ iq) throws XmppException {
 		
-		VerbRef ref = null;
-		IQ result = ((IQ)connection.sendAndWait(iq));
-		if (result != null) {
-			if (result.hasChild("error")) {
-				throw new XmppException(result.getError());
+		Lock lock = connectionLock.readLock();
+		lock.lock();
+		try {
+			VerbRef ref = null;
+			IQ result = ((IQ)connection.sendAndWait(iq));
+			if (result != null) {
+				if (result.hasChild("error")) {
+					throw new XmppException(result.getError());
+				}
+				RefEvent reference = (RefEvent)result.getExtension().getObject();
+				ref = new VerbRef(callId, reference.getJid());
+				return ref;
+			} else {
+				return null;
 			}
-			RefEvent reference = (RefEvent)result.getExtension().getObject();
-			ref = new VerbRef(callId, reference.getJid());
-			return ref;
-		} else {
-			return null;
-		}
+		} finally {
+			lock.unlock();
+		}		
 	}
 	
 	/**
@@ -1208,7 +1296,13 @@ public class RayoClient {
 	
 	protected IQ sendIQ(IQ iq) throws XmppException {
 		
-		return (IQ)connection.sendAndWait(iq);
+		Lock lock = connectionLock.readLock();
+		lock.lock();
+		try {
+			return (IQ)connection.sendAndWait(iq);
+		} finally {
+			lock.unlock();
+		}			
 	}
 	
 	private String buildFrom() {
@@ -1236,16 +1330,23 @@ public class RayoClient {
 	}
 
 	private void ping() {
-		if (connection.isConnected()) {
-			IQ ping = new IQ(IQ.Type.get)
-				.setFrom(buildFrom())
-				.setTo(rayoServer)
-				.setChild(new Ping());
-			try {
-				connection.send(ping);
-			} catch (XmppException e) {
-				e.printStackTrace();
+		
+		Lock lock = connectionLock.readLock();
+		lock.lock();
+		try {
+			if (connection.isConnected()) {
+				IQ ping = new IQ(IQ.Type.get)
+					.setFrom(buildFrom())
+					.setTo(rayoServer)
+					.setChild(new Ping());
+				try {
+					connection.send(ping);
+				} catch (XmppException e) {
+					e.printStackTrace();
+				}
 			}
-		}
+		} finally {
+			lock.unlock();
+		}		
 	}
 }

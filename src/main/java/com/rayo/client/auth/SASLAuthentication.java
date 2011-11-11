@@ -101,6 +101,7 @@ public class SASLAuthentication implements UserAuthentication {
     
     private CountDownLatch authenticationLatch = new CountDownLatch(1);
     private CountDownLatch bindingLatch = new CountDownLatch(1);
+    private CountDownLatch sessionLatch = new CountDownLatch(1);
 
     static {
 
@@ -465,6 +466,12 @@ public class SASLAuthentication implements UserAuthentication {
         Bind bind = response.getBind();
         String userJID = bind.getJID();
 
+        // with the new async refactoring, session can take a bit to arrive
+    	try {
+			sessionLatch.await(2, TimeUnit.SECONDS);
+		} catch (InterruptedException e1) {
+		}
+        
         if (sessionSupported) {
         	IQ iqSession = new IQ()
         		.setChild(new Session())
@@ -567,6 +574,7 @@ public class SASLAuthentication implements UserAuthentication {
     public void sessionsSupported() {
     	
         sessionSupported = true;
+        sessionLatch.countDown();
     }
     
     /**

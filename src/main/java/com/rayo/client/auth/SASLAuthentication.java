@@ -318,6 +318,7 @@ public class SASLAuthentication implements UserAuthentication {
     	
         // Locate the SASLMechanism to use
         String selectedMechanism = null;
+        System.out.println("Checking mechanisms. Preferences: " + mechanismsPreferences + ". Implemented: " + implementedMechanisms);
         for (String mechanism : mechanismsPreferences) {
             if (implementedMechanisms.containsKey(mechanism) &&
             		serverMethods.contains(mechanism)) {
@@ -444,7 +445,6 @@ public class SASLAuthentication implements UserAuthentication {
 		}
     	
         if (!resourceBinded) {
-        	printStacktraces();
             // Server never offered resource binding
             throw new XmppException("Resource binding not offered by server");
         }
@@ -590,15 +590,4 @@ public class SASLAuthentication implements UserAuthentication {
         resourceBinded = false;
         sessionSupported = false;
     }
-    
-    public void printStacktraces() {
-		
-    	for (Map.Entry<Thread, StackTraceElement[]> entry: Thread.getAllStackTraces().entrySet()) {
-    		System.out.println("Thread name: " + entry.getKey());
-    		for (StackTraceElement trace: entry.getValue()) {
-    			System.out.println(trace.toString());
-    		}
-    		System.out.println("....................................");
-    	}
-	}
 }

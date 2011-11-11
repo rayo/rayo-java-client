@@ -234,13 +234,7 @@ public class XmppReaderWorker implements Runnable {
                     	// We now need to bind a resource for the connection
                         // Open a new stream and wait for the response
                     	for (final XmppConnectionListener listener: listeners) {
-            	    		executorService.execute(new Runnable() {								
-								@Override
-								public void run() {
-		            	    		listener.connectionReset(connectionId);									
-								}
-							});
-                    		
+		            	    listener.connectionReset(connectionId);									
                     	}
 
                         // Reset the state of the parser since a new stream element is going
@@ -256,12 +250,7 @@ public class XmppReaderWorker implements Runnable {
                     if (parser.getName().equals("stream")) {
                         // Disconnect the connection
             	    	for (final XmppConnectionListener listener: listeners) {
-            	    		executorService.execute(new Runnable() {								
-								@Override
-								public void run() {
-		            	    		listener.connectionFinished(connectionId);									
-								}
-							});
+		            	    listener.connectionFinished(connectionId);									
             	    	}
                     }
                 }
@@ -368,12 +357,7 @@ public class XmppReaderWorker implements Runnable {
     	
     	if (connectionId != null) {
 	    	for (final XmppConnectionListener listener: listeners) {
-	    		executorService.execute(new Runnable() {								
-					@Override
-					public void run() {
-        	    		listener.connectionEstablished(connectionId);									
-					}
-				});
+        	    listener.connectionEstablished(connectionId);									
 	    	}
     	}
     }
@@ -382,12 +366,7 @@ public class XmppReaderWorker implements Runnable {
     	
     	if (connectionId != null) {
 	    	for (final XmppConnectionListener listener: listeners) {
-	    		executorService.execute(new Runnable() {								
-					@Override
-					public void run() {
-        	    		listener.connectionFinished(connectionId);									
-					}
-				});	    		
+        	    listener.connectionFinished(connectionId);									
 	    	}
     	}
     }

@@ -274,11 +274,13 @@ public class XmppReaderWorker implements Runnable {
 
     private void filter(final AbstractXmppObject object) {
 
+    	log("Invoking filters");
 		executorService.execute(new Runnable() {								
 			@Override
 			public void run() {
 		    	for (XmppObjectFilter filter: filters) {		    		
 		    		try {
+		    	    	log("Invoking filter " + filter);
 		    			filter.filter(object);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -422,6 +424,7 @@ public class XmppReaderWorker implements Runnable {
     
     private void log(String value) {
     	
-    	System.out.println(String.format("[IN ] [%s] [%s]", DateFormatUtils.format(new Date(),"hh:mm:ss.SSS"),value));
+    	System.out.println(String.format("[IN ] [%s] [%s] [%s]", DateFormatUtils.format(new Date(),"hh:mm:ss.SSS"), Thread.currentThread(), value));
     }
+
 }

@@ -458,12 +458,14 @@ public class SASLAuthentication implements UserAuthentication {
         IQ iqBind = new IQ(IQ.Type.set,new Bind().setResource(resource));
 
         XmppObjectFilter filter = new XmppObjectIdFilter(iqBind.getId());
+        log("Adding bind filter " + filter + " to connection " + connection);
         connection.addFilter(filter);
         connection.send(iqBind);        
-        IQ response = (IQ) filter.poll(5000);
+        IQ response = (IQ) filter.poll(10000);
         filter.stop();
                 
         if (response == null) {
+        	log("No response for bind message");
             throw new XmppException("No response from the server.");
         }
         // If the server replied with an error, throw an exception.
@@ -487,10 +489,11 @@ public class SASLAuthentication implements UserAuthentication {
             connection.addFilter(filter);
             connection.send(iqSession);
             
-            IQ ack = (IQ) filter.poll(5000);
+            IQ ack = (IQ) filter.poll(10000);
             filter.stop();
             
             if (ack == null) {
+            	log("No response for session message");
                 throw new XmppException("No response from the server.");
             }
             // If the server replied with an error, throw an exception.
@@ -569,7 +572,7 @@ public class SASLAuthentication implements UserAuthentication {
      */
     public void bindingRequired() {
 
-    	System.out.println(String.format("Receiveded bind on SASLAuthentication instance [%s]", this));                	
+    	System.out.println(String.format("Received bind on SASLAuthentication instance [%s]", this));                	
     	resourceBinded = true;
     	bindingLatch.countDown();
     }
@@ -608,4 +611,9 @@ public class SASLAuthentication implements UserAuthentication {
     		System.out.println("....................................");
     	}
 	}
+    
+    private void log(String value) {
+    	
+    	System.out.println(String.format("[IN ] [%s] [%s] [%s]", DateFormatUtils.format(new Date(),"hh:mm:ss.SSS"), Thread.currentThread(), value));
+    }
 }

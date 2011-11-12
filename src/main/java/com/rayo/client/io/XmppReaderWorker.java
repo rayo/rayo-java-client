@@ -47,7 +47,7 @@ public class XmppReaderWorker implements Runnable {
 	
 	public XmppReaderWorker() {
 		
-		executorService = Executors.newCachedThreadPool();
+		executorService = Executors.newFixedThreadPool(10);
 	}
 	
 	@Override

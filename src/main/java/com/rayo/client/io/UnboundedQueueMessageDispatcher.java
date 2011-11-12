@@ -51,14 +51,19 @@ public class UnboundedQueueMessageDispatcher implements MessageDispatcher {
 					} catch (InterruptedException e) {}
 					
 					if (object != null) {
+						log(String.format("Fetched XMPP Object [%s] from the dispatching queue", object));
 						for(StanzaListener listener: stanzaListeners) {
 							if (object instanceof IQ) {
+								log(String.format("Invoking listener [%s] onIQ method with IQ [%s]", listener, object));
 								listener.onIQ((IQ)object);
 							} else if (object instanceof Presence) {
+								log(String.format("Invoking listener [%s] onPresence method  with stanza [%s]", listener, object));
 								listener.onPresence((Presence)object);
 							} else if (object instanceof Message) {
+								log(String.format("Invoking listener [%s] onMessage method with stanza [%s]", listener, object));
 								listener.onMessage((Message)object);
 							} else if (object instanceof Error) {
+								log(String.format("Invoking listener [%s] onError method with error [%s]", listener, object));
 								listener.onError((Error)object);
 							}
 						}
@@ -97,6 +102,7 @@ public class UnboundedQueueMessageDispatcher implements MessageDispatcher {
     @Override
     public void dispatch(XmppObject object) {
 
+		log(String.format("Dispatching XMPP Object [%s] to the dispatching queue", object));
     	messages.add(object);
     }
     

@@ -3,12 +3,13 @@ package com.rayo.client;
 import com.rayo.client.auth.AuthenticationSupport;
 import com.rayo.client.filter.XmppObjectFilterSupport;
 import com.rayo.client.listener.StanzaListener;
+import com.rayo.client.listener.StanzaListenerSupport;
 import com.rayo.client.response.ResponseHandler;
 import com.rayo.client.xmpp.extensions.Extension;
 import com.rayo.client.xmpp.stanza.XmppObject;
 
 
-public interface XmppConnection extends XmppObjectFilterSupport, AuthenticationSupport {
+public interface XmppConnection extends XmppObjectFilterSupport, AuthenticationSupport, StanzaListenerSupport {
 
 	public ConnectionConfiguration getConfiguration();
 	public void connect() throws XmppException;
@@ -25,9 +26,6 @@ public interface XmppConnection extends XmppObjectFilterSupport, AuthenticationS
 	public String getServiceName();
 	public boolean isConnected();
 	public boolean isAuthenticated();
-	
-	public void addStanzaListener(StanzaListener stanzaListener);
-	public void removeStanzaListener(StanzaListener stanzaListener);
 
 	public void addXmppConnectionListener(XmppConnectionListener connectionListener);
 	public void removeXmppConnectionListener(XmppConnectionListener connectionListener);

@@ -5,8 +5,6 @@ import java.net.SocketException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.xmlpull.mxp1.MXParser;
@@ -16,9 +14,10 @@ import org.xmlpull.v1.XmlPullParserException;
 import com.rayo.client.XmppConnectionListener;
 import com.rayo.client.auth.AuthenticationListener;
 import com.rayo.client.filter.XmppObjectFilter;
+import com.rayo.client.filter.XmppObjectFilterSupport;
 import com.rayo.client.listener.StanzaListener;
+import com.rayo.client.listener.StanzaListenerSupport;
 import com.rayo.client.util.XmppObjectParser;
-import com.rayo.client.xmpp.stanza.AbstractXmppObject;
 import com.rayo.client.xmpp.stanza.Error;
 import com.rayo.client.xmpp.stanza.Error.Condition;
 import com.rayo.client.xmpp.stanza.Error.Type;
@@ -29,7 +28,7 @@ import com.rayo.client.xmpp.stanza.XmppObject;
 import com.rayo.client.xmpp.stanza.sasl.Challenge;
 import com.rayo.client.xmpp.stanza.sasl.Success;
 
-public class XmppReaderWorker implements Runnable {
+public class XmppReaderWorker implements Runnable, StanzaListenerSupport, XmppObjectFilterSupport {
 	
 	private XmlPullParser parser;
 	private String connectionId;
@@ -39,15 +38,13 @@ public class XmppReaderWorker implements Runnable {
 	private Reader reader;
 	
 	private Collection<XmppConnectionListener> listeners = new ConcurrentLinkedQueue<XmppConnectionListener>();
-	private Collection<StanzaListener> stanzaListeners = new ConcurrentLinkedQueue<StanzaListener>();
 	private Collection<AuthenticationListener> authListeners = new ConcurrentLinkedQueue<AuthenticationListener>();
-	private Collection<XmppObjectFilter> filters = new ConcurrentLinkedQueue<XmppObjectFilter>();
 	
-	private ExecutorService executorService;
+	private MessageDispatcher messageDispatcher;
 	
 	public XmppReaderWorker() {
 		
-		executorService = Executors.newFixedThreadPool(10);
+		messageDispatcher = new UnboundedQueueMessageDispatcher();
 	}
 	
 	@Override
@@ -68,12 +65,12 @@ public class XmppReaderWorker implements Runnable {
 	
 	public void addStanzaListener(StanzaListener listener) {
 		
-		stanzaListeners.add(listener);
+		messageDispatcher.addStanzaListener(listener);
 	}
 	
 	public void removeStanzaListener(StanzaListener listener) {
 		
-		stanzaListeners.remove(listener);
+		messageDispatcher.removeStanzaListener(listener);
 	}
 	
     public void addAuthenticationListener(AuthenticationListener authListener) {
@@ -88,12 +85,12 @@ public class XmppReaderWorker implements Runnable {
     
     public void addFilter(XmppObjectFilter filter) {
 
-    	filters.add(filter);
+    	messageDispatcher.addFilter(filter);
     }
     
     public void removeFilter(XmppObjectFilter filter) {
 
-    	filters.remove(filter);
+    	messageDispatcher.removeFilter(filter);
     }  
 	
     public void resetParser(Reader reader) {
@@ -124,57 +121,18 @@ public class XmppReaderWorker implements Runnable {
                     if (parser.getName().equals("message")) {
                     	final Message message = XmppObjectParser.parseMessage(parser);
                     	log(message);
-                    	for (final StanzaListener listener: stanzaListeners) {
-            	    		executorService.execute(new Runnable() {								
-            					@Override
-            					public void run() {
-                            		try {
-                            			listener.onMessage(message);
-        	                		} catch (Exception e) {
-        	                			e.printStackTrace();
-        	                			handleError(new Error(Condition.undefined_condition, Type.cancel, String.format("Error on client listener: %s - %s",e.getClass(),e.getMessage())));  
-        	                		}                    		
-            					}
-            				});                    		
-                    	}
-                    	filter(message);
+                    	messageDispatcher.dispatch(message);
                     } else if (parser.getName().equals("iq")) {
                     	final IQ iq = XmppObjectParser.parseIQ(parser);
                     	if (iq.hasChild("error")) {
                     		handleError(iq.getError());
                     	}
                     	log(iq);
-                    	for (final StanzaListener listener: stanzaListeners) {
-            	    		executorService.execute(new Runnable() {								
-            					@Override
-            					public void run() {
-                            		try {
-                            			listener.onIQ(iq);
-                            		} catch (Exception e) {
-                            			e.printStackTrace();
-                            			handleError(new Error(Condition.undefined_condition, Type.cancel, String.format("Error on client listener: %s - %s",e.getClass(),e.getMessage())));  
-                            		}                 		
-            					}
-            				});                    		
-                    	}                    	
-                    	filter(iq);
+                    	messageDispatcher.dispatch(iq);
                     } else if (parser.getName().equals("presence")) {
                     	final Presence presence = XmppObjectParser.parsePresence(parser);
                     	log(presence);
-                    	for (final StanzaListener listener: stanzaListeners) {
-            	    		executorService.execute(new Runnable() {								
-            					@Override
-            					public void run() {
-                            		try {
-                            			listener.onPresence(presence);
-        	                		} catch (Exception e) {
-        	                			e.printStackTrace();
-                            			handleError(new Error(Condition.undefined_condition, Type.cancel, String.format("Error on client listener: %s - %s",e.getClass(),e.getMessage())));  
-        	                		}                   		
-            					}
-            				});                    		
-                    	}
-                    	filter(presence);
+                    	messageDispatcher.dispatch(presence);
                     }
                     // We found an opening stream. Record information about it, then notify
                     // the connectionID lock so that the packet reader startup can finish.
@@ -204,7 +162,6 @@ public class XmppReaderWorker implements Runnable {
                     else if (parser.getName().equals("error")) {
                     	Error error = XmppObjectParser.parseError(parser);
                     	log(error);
-                    	filter(error);
                     	handleError(error);
                     }
                     else if (parser.getName().equals("features")) {
@@ -229,8 +186,6 @@ public class XmppReaderWorker implements Runnable {
                     	for (final AuthenticationListener listener: authListeners) {
                     	    listener.authSuccessful(success);
                     	}
-                    	
-                    	filter(success);
 
                     	// We now need to bind a resource for the connection
                         // Open a new stream and wait for the response
@@ -272,26 +227,6 @@ public class XmppReaderWorker implements Runnable {
         	handleError(new Error(Condition.undefined_condition, Type.cancel, e.getMessage()));
         }
     }
-
-
-    private void filter(final AbstractXmppObject object) {
-
-    	log("Invoking filters");
-		executorService.execute(new Runnable() {								
-			@Override
-			public void run() {
-		    	for (XmppObjectFilter filter: filters) {		    		
-		    		try {
-		    	    	log("Invoking filter " + filter);
-		    			filter.filter(object);
-					} catch (Exception e) {
-						e.printStackTrace();
-		    			handleError(new Error(Condition.undefined_condition, Type.cancel, String.format("Error on client filter: %s - %s",e.getClass(),e.getMessage())));  
-					}    		
-		    	}                  		
-			}
-		}); 
-	}
 
 	private void parseFeatures(XmlPullParser parser) throws Exception {
     	
@@ -377,13 +312,7 @@ public class XmppReaderWorker implements Runnable {
     
     void handleError(Error e) {
     	
-    	for (StanzaListener listener: stanzaListeners) {
-    		try {
-    			listener.onError(e);
-    		} catch (Exception ex) {
-    			ex.printStackTrace();
-    		}    			
-    	}
+    	messageDispatcher.dispatch(e);
     }
 
 	public void setDone(boolean done) {
@@ -409,9 +338,8 @@ public class XmppReaderWorker implements Runnable {
 	private void cleanListeners() {
 		
 		listeners.clear();
-		stanzaListeners.clear();
 		authListeners.clear();
-		filters.clear();
+		messageDispatcher.reset();
 	};
     
     public String getConnectionId() {

@@ -54,16 +54,16 @@ public class UnboundedQueueMessageDispatcher implements MessageDispatcher {
 						log(String.format("Fetched XMPP Object [%s] from the dispatching queue", object));
 						for(StanzaListener listener: stanzaListeners) {
 							if (object instanceof IQ) {
-								log(String.format("Invoking listener [%s] onIQ method with IQ [%s]", listener, object));
+								log(String.format("Invoking listener [%s] onIQ method with IQ id [%s]", listener, object.getId()));
 								listener.onIQ((IQ)object);
 							} else if (object instanceof Presence) {
-								log(String.format("Invoking listener [%s] onPresence method  with stanza [%s]", listener, object));
+								log(String.format("Invoking listener [%s] onPresence method  with presence id [%s]", listener, object.getId()));
 								listener.onPresence((Presence)object);
 							} else if (object instanceof Message) {
-								log(String.format("Invoking listener [%s] onMessage method with stanza [%s]", listener, object));
+								log(String.format("Invoking listener [%s] onMessage method with message id [%s]", listener, object.getId()));
 								listener.onMessage((Message)object);
 							} else if (object instanceof Error) {
-								log(String.format("Invoking listener [%s] onError method with error [%s]", listener, object));
+								log(String.format("Invoking listener [%s] onError method with error id [%s]", listener, object.getId()));
 								listener.onError((Error)object);
 							}
 							log(String.format("Listener [%s] has finished its work", listener));

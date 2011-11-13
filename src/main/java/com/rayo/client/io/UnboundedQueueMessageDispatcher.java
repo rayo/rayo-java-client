@@ -103,7 +103,7 @@ public class UnboundedQueueMessageDispatcher implements MessageDispatcher {
     @Override
     public void dispatch(XmppObject object) {
 
-		log(String.format("Dispatching XMPP Object [%s] to the dispatching queue", object));
+		log(String.format("Dispatching XMPP Object with id [%s] to the dispatching queue", object.getId()));
     	messages.add(object);
     }
     

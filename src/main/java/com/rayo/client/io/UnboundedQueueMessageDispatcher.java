@@ -66,6 +66,7 @@ public class UnboundedQueueMessageDispatcher implements MessageDispatcher {
 								log(String.format("Invoking listener [%s] onError method with error [%s]", listener, object));
 								listener.onError((Error)object);
 							}
+							log(String.format("Listener [%s] has finished its work", object));
 						}
 						filter((AbstractXmppObject)object);
 					}
@@ -113,6 +114,7 @@ public class UnboundedQueueMessageDispatcher implements MessageDispatcher {
     		try {
     	    	log("Invoking filter " + filter);
     			filter.filter(object);
+				log(String.format("Filter [%s] has finished its work", object));
 			} catch (Exception e) {
 				e.printStackTrace();
     			dispatch(new Error(Condition.undefined_condition, Type.cancel, String.format("Error on client filter: %s - %s",e.getClass(),e.getMessage())));  

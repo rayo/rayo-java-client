@@ -12,17 +12,17 @@ import com.rayo.client.filter.XmppObjectFilter;
 import com.rayo.client.listener.StanzaListener;
 import com.rayo.client.xmpp.stanza.AbstractXmppObject;
 import com.rayo.client.xmpp.stanza.Error;
+import com.rayo.client.xmpp.stanza.Error.Condition;
+import com.rayo.client.xmpp.stanza.Error.Type;
 import com.rayo.client.xmpp.stanza.IQ;
 import com.rayo.client.xmpp.stanza.Message;
 import com.rayo.client.xmpp.stanza.Presence;
 import com.rayo.client.xmpp.stanza.XmppObject;
-import com.rayo.client.xmpp.stanza.Error.Condition;
-import com.rayo.client.xmpp.stanza.Error.Type;
 
 /**
  * <p>Implements the {@link MessageDispatcher} interface providing an 
- * implementation based in an unbouded queue and a thread that reads from 
- * the queue and dispatches messages to the different listeners and filters.</p> 
+ * implementation based in an unbounded queue and a thread that reads from 
+ * the queue and dispatches messages to the different listeners and filters.</p>
  * 
  * @author martin
  *
@@ -32,7 +32,8 @@ public class UnboundedQueueMessageDispatcher implements MessageDispatcher {
 	private Collection<StanzaListener> stanzaListeners = new ConcurrentLinkedQueue<StanzaListener>();
 	private Collection<XmppObjectFilter> filters = new ConcurrentLinkedQueue<XmppObjectFilter>();
 
-	private LinkedBlockingQueue<XmppObject> messages = new LinkedBlockingQueue<XmppObject>();
+	private LinkedBlockingQueue<XmppObject> messagesQueue = new LinkedBlockingQueue<XmppObject>();
+	private LinkedBlockingQueue<XmppObject> filtersQueue = new LinkedBlockingQueue<XmppObject>();
 	
 	/**
 	 * Initiates the message dispatcher. When created, the instance will start a 
@@ -40,40 +41,42 @@ public class UnboundedQueueMessageDispatcher implements MessageDispatcher {
 	 */
 	public UnboundedQueueMessageDispatcher() {
 		
-		Runnable dispatcherTask = new Runnable() {
+		Runnable listenersTask = new Runnable() {
 			
 			@Override
 			public void run() {
 				while(true) {
 					XmppObject object = null;
 					try {
-						object = messages.poll(1000, TimeUnit.SECONDS);
+						object = messagesQueue.poll(1000, TimeUnit.SECONDS);
 					} catch (InterruptedException e) {}
 					
 					if (object != null) {
-						log(String.format("Fetched XMPP Object [%s] from the dispatching queue", object));
-						for(StanzaListener listener: stanzaListeners) {
-							if (object instanceof IQ) {
-								log(String.format("Invoking listener [%s] onIQ method with IQ id [%s]", listener, object.getId()));
-								listener.onIQ((IQ)object);
-							} else if (object instanceof Presence) {
-								log(String.format("Invoking listener [%s] onPresence method  with presence id [%s]", listener, object.getId()));
-								listener.onPresence((Presence)object);
-							} else if (object instanceof Message) {
-								log(String.format("Invoking listener [%s] onMessage method with message id [%s]", listener, object.getId()));
-								listener.onMessage((Message)object);
-							} else if (object instanceof Error) {
-								log(String.format("Invoking listener [%s] onError method with error id [%s]", listener, object.getId()));
-								listener.onError((Error)object);
-							}
-							log(String.format("Listener [%s] has finished its work", listener));
-						}
+						process(object);
+					}
+				}
+			}
+		};
+		new Thread(listenersTask).start();
+		
+		Runnable filterTask = new Runnable() {
+			
+			@Override
+			public void run() {
+				while(true) {
+					XmppObject object = null;
+					try {
+						object = filtersQueue.poll(1000, TimeUnit.SECONDS);
+					} catch (InterruptedException e) {}
+					
+					if (object != null) {
 						filter((AbstractXmppObject)object);
 					}
 				}
 			}
 		};
-		new Thread(dispatcherTask).start();
+		new Thread(filterTask).start();
+
 	}
 
 	@Override
@@ -104,7 +107,8 @@ public class UnboundedQueueMessageDispatcher implements MessageDispatcher {
     public void dispatch(XmppObject object) {
 
 		log(String.format("Dispatching XMPP Object with id [%s] to the dispatching queue", object.getId()));
-    	messages.add(object);
+    	messagesQueue.add(object);
+    	filtersQueue.add(object);
     }
     
     private void filter(final AbstractXmppObject object) {
@@ -125,13 +129,33 @@ public class UnboundedQueueMessageDispatcher implements MessageDispatcher {
     @Override
     public void reset() {
 
-    	messages.clear();
+    	messagesQueue.clear();
     	filters.clear();
     	stanzaListeners.clear();
     }
     
     private void log(String value) {
     	
-    	System.out.println(String.format("[IN ] [%s] [%s] [%s]", DateFormatUtils.format(new Date(),"hh:mm:ss.SSS"), Thread.currentThread(), value));
+    	System.out.println(String.format("[   ] [%s] [%s] [%s]", DateFormatUtils.format(new Date(),"hh:mm:ss.SSS"), Thread.currentThread(), value));
     }
+
+	private void process(XmppObject object) {
+		log(String.format("Fetched XMPP Object [%s] from the dispatching queue", object));
+		for(StanzaListener listener: stanzaListeners) {
+			if (object instanceof IQ) {
+				log(String.format("Invoking listener [%s] onIQ method with IQ id [%s]", listener, object.getId()));
+				listener.onIQ((IQ)object);
+			} else if (object instanceof Presence) {
+				log(String.format("Invoking listener [%s] onPresence method  with presence id [%s]", listener, object.getId()));
+				listener.onPresence((Presence)object);
+			} else if (object instanceof Message) {
+				log(String.format("Invoking listener [%s] onMessage method with message id [%s]", listener, object.getId()));
+				listener.onMessage((Message)object);
+			} else if (object instanceof Error) {
+				log(String.format("Invoking listener [%s] onError method with error id [%s]", listener, object.getId()));
+				listener.onError((Error)object);
+			}
+			log(String.format("Listener [%s] has finished its work", listener));
+		}		
+	}
 }

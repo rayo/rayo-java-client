@@ -254,6 +254,26 @@ public class RayoClient {
 		}
 	}
 
+	public void setAvailable(boolean status) throws XmppException {
+		
+		if (status == true) {
+			broadcastAvailability();
+		} else {
+			broadcastUnavailability();
+		}
+	}
+	
+	public void setStatus(Show status) throws XmppException {
+		
+		Presence presence = new Presence()
+			.setId(UUID.randomUUID().toString())
+			.setFrom(connection.getUsername() + "@" + connection.getServiceName() + "/" + connection.getResource())
+			.setTo(rayoServer)
+			.setShow(status);
+		
+		connection.send(presence);
+	}
+	
 	private void broadcastAvailability() throws XmppException {
 
 		Presence presence = new Presence()

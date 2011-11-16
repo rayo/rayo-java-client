@@ -1,6 +1,8 @@
 package com.rayo.client;
 
 import org.jolokia.client.J4pClient;
+import org.jolokia.client.request.J4pExecRequest;
+import org.jolokia.client.request.J4pExecResponse;
 import org.jolokia.client.request.J4pReadRequest;
 import org.jolokia.client.request.J4pReadResponse;
 
@@ -20,6 +22,13 @@ public class JmxClient {
 		  return resp.getValue();
 	}
 
+	public Object jmxExec(String mbean, String operation, Object... args) throws Exception {
+		
+		  J4pExecRequest req = new J4pExecRequest(mbean,operation, args);
+		  J4pExecResponse resp = client.execute(req);
+		  return resp.getValue();
+	}
+	
 	public static void main(String[] args) throws Exception {
 		
 		System.out.print(new JmxClient("localhost","8080").jmxValue("com.rayo:Type=MixerStatistics", "ActiveMixersCount"));

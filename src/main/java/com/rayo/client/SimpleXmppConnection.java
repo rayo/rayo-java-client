@@ -33,6 +33,7 @@ import com.rayo.client.xmpp.extensions.Extension;
 import com.rayo.client.xmpp.stanza.Error;
 import com.rayo.client.xmpp.stanza.Error.Condition;
 import com.rayo.client.xmpp.stanza.Error.Type;
+import com.rayo.client.xmpp.stanza.Stanza;
 import com.rayo.client.xmpp.stanza.XmppObject;
 
 public class SimpleXmppConnection implements XmppConnection {
@@ -361,7 +362,7 @@ public class SimpleXmppConnection implements XmppConnection {
 	        if (response == null) {
 	        	throw new XmppException(String.format("Timed out while waiting for [%s]",extensionName));
 	        }
-	        return (Extension)response;
+	        return ((Stanza<?>)response).getExtension();
 		} finally {
 			removeFilter(filter);
 		}

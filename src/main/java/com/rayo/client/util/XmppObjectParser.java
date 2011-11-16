@@ -775,7 +775,10 @@ public class XmppObjectParser {
                     	condition = Error.Condition.fromXMPP(elementName);
                     }
                     else {
-                    	//extensions.add(parsePacketExtension(elementName, namespace, parser));
+                    	// try anyways
+                    	try {
+                    		condition = Error.Condition.fromXMPP(elementName);
+                    	} catch (Exception e) {}
                     }
                 }
             }

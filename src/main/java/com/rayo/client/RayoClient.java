@@ -789,6 +789,21 @@ public class RayoClient {
 		}
 		transfer.setTo(to);
 		
+		return transfer(transfer, callId);
+	}
+	
+	/**
+	 * Transfers a call to another phone with the specified settings
+	 * 
+	 * @param transfer Model object with all the transfer settings
+	 * @param callId Id of the call that we want to transfer
+
+	 * @return IQ Resulting IQ
+	 * 
+	 * @throws XmppException If there is any issue while transfering the call
+	 */
+	public IQ transfer(Transfer transfer,String callId) throws XmppException {
+		
 		IQ iq = new IQ(IQ.Type.set)
 			.setFrom(buildFrom())
 			.setTo(buildTo(callId))

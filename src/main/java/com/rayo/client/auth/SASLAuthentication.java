@@ -35,6 +35,8 @@ import java.util.concurrent.TimeUnit;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.rayo.client.XmppConnection;
 import com.rayo.client.XmppException;
@@ -74,11 +76,15 @@ import com.rayo.client.xmpp.stanza.sasl.AuthMechanism;
  *
  * @see org.jivesoftware.smack.sasl.SASLMechanism
  *
+ * Code adapted from Smack. Original authors:
+ *
  * @author Gaston Dombiak
  * @author Jay Kline
  */
 public class SASLAuthentication implements UserAuthentication {
 
+	private Logger log = LoggerFactory.getLogger(SASLAuthentication.class);
+	
     private static Map<String, Class> implementedMechanisms = new HashMap<String, Class>();
     private static List<String> mechanismsPreferences = new ArrayList<String>();
 
@@ -321,7 +327,7 @@ public class SASLAuthentication implements UserAuthentication {
     	
         // Locate the SASLMechanism to use
         String selectedMechanism = null;
-        System.out.println("Checking mechanisms. Preferences: " + mechanismsPreferences + ". Implemented: " + implementedMechanisms + ". Server methods: " + serverMethods);
+        log.trace("Checking mechanisms. Preferences: " + mechanismsPreferences + ". Implemented: " + implementedMechanisms + ". Server methods: " + serverMethods);
         for (String mechanism : mechanismsPreferences) {
             if (implementedMechanisms.containsKey(mechanism) &&
             		serverMethods.contains(mechanism)) {
@@ -449,23 +455,22 @@ public class SASLAuthentication implements UserAuthentication {
     	
         if (!resourceBinded) {
             // Server never offered resource binding
-        	System.out.println(String.format("[%s] Bind not received on SASLAuthentication instance [%s]", DateFormatUtils.format(new Date(),"hh:mm:ss.SSS"), this));                	
-        	System.out.println("Count down latch: " + bindingLatch.getCount());
-        	printStacktraces();
+        	log.trace(String.format("[%s] Bind not received on SASLAuthentication instance [%s]", DateFormatUtils.format(new Date(),"hh:mm:ss.SSS"), this));                	
+        	log.trace("Count down latch: " + bindingLatch.getCount());
         	throw new XmppException("Resource binding not offered by server");
         }
 
         IQ iqBind = new IQ(IQ.Type.set,new Bind().setResource(resource));
 
         XmppObjectFilter filter = new XmppObjectIdFilter(iqBind.getId());
-        log("Adding bind filter " + filter + " to connection " + connection);
+        log.trace("Adding bind filter " + filter + " to connection " + connection);
         connection.addFilter(filter);
         connection.send(iqBind);        
         IQ response = (IQ) filter.poll(10000);
         filter.stop();
                 
         if (response == null) {
-        	log("No response for bind message");
+        	log.error("No response for bind message");
             throw new XmppException("No response from the server.");
         }
         // If the server replied with an error, throw an exception.
@@ -493,7 +498,7 @@ public class SASLAuthentication implements UserAuthentication {
             filter.stop();
             
             if (ack == null) {
-            	log("No response for session message");
+            	log.error("No response for session message");
                 throw new XmppException("No response from the server.");
             }
             // If the server replied with an error, throw an exception.
@@ -572,7 +577,7 @@ public class SASLAuthentication implements UserAuthentication {
      */
     public void bindingRequired() {
 
-    	System.out.println(String.format("Received bind on SASLAuthentication instance [%s]", this));                	
+    	log.trace(String.format("Received bind on SASLAuthentication instance [%s]", this));                	
     	resourceBinded = true;
     	bindingLatch.countDown();
     }
@@ -599,21 +604,5 @@ public class SASLAuthentication implements UserAuthentication {
         saslFailed = false;
         resourceBinded = false;
         sessionSupported = false;
-    }
-    
-    public void printStacktraces() {
-		
-    	for (Map.Entry<Thread, StackTraceElement[]> entry: Thread.getAllStackTraces().entrySet()) {
-    		System.out.println("Thread name: " + entry.getKey());
-    		for (StackTraceElement trace: entry.getValue()) {
-    			System.out.println(trace.toString());
-    		}
-    		System.out.println("....................................");
-    	}
-	}
-    
-    private void log(String value) {
-    	
-    	System.out.println(String.format("[IN ] [%s] [%s] [%s]", DateFormatUtils.format(new Date(),"hh:mm:ss.SSS"), Thread.currentThread(), value));
     }
 }

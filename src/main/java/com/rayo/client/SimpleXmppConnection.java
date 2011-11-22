@@ -8,12 +8,12 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang.time.DateFormatUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.rayo.client.auth.AuthenticationHandler;
 import com.rayo.client.auth.AuthenticationListener;
@@ -38,6 +38,8 @@ import com.rayo.client.xmpp.stanza.XmppObject;
 
 public class SimpleXmppConnection implements XmppConnection {
 
+	private Logger log = LoggerFactory.getLogger(SimpleXmppConnection.class);
+	
 	private XmppReader reader;
 	private XmppWriter writer;
 	private ConnectionConfiguration config;
@@ -177,7 +179,7 @@ public class SimpleXmppConnection implements XmppConnection {
 		// from the socket
 		// TODO: Check if implementing keep alive solves this issue
 		try {
-			System.out.println("Closing XMPP socket connection");
+			log.debug("Closing XMPP socket connection");
 			socket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -205,7 +207,7 @@ public class SimpleXmppConnection implements XmppConnection {
 		if (!loggingIn && !authenticationHandler.isAuthenticated()) {
 			throw new XmppException(new Error(Condition.not_authorized, Type.cancel, "Not authenticated. You need to authenticate first."));			
 		}
-    	System.out.println(String.format("[OUT] [%s] [%s]", DateFormatUtils.format(new Date(),"hh:mm:ss.SSS"),object));
+    	log.debug(String.format("[OUT] [%s]",object));
 		writer.write(object);
 		
 		for (XmppConnectionListener listener: listeners) {

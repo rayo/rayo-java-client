@@ -1,12 +1,12 @@
 package com.rayo.client.io;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang.time.DateFormatUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.rayo.client.filter.XmppObjectFilter;
 import com.rayo.client.listener.StanzaListener;
@@ -29,6 +29,8 @@ import com.rayo.client.xmpp.stanza.XmppObject;
  */
 public class UnboundedQueueMessageDispatcher implements MessageDispatcher {
 
+	private Logger log = LoggerFactory.getLogger(UnboundedQueueMessageDispatcher.class);
+	
 	private Collection<StanzaListener> stanzaListeners = new ConcurrentLinkedQueue<StanzaListener>();
 	private Collection<XmppObjectFilter> filters = new ConcurrentLinkedQueue<XmppObjectFilter>();
 
@@ -106,24 +108,25 @@ public class UnboundedQueueMessageDispatcher implements MessageDispatcher {
     @Override
     public void dispatch(XmppObject object) {
 
-		log(String.format("Dispatching XMPP Object with id [%s] to the dispatching queue", object.getId()));
+		log.trace(String.format("Dispatching XMPP Object with id [%s] to the dispatching queue", object.getId()));
     	messagesQueue.add(object);
     	filtersQueue.add(object);
     }
     
     private void filter(final AbstractXmppObject object) {
 
-    	log("Invoking filters");
+    	log.trace(String.format("Invoking filters on XMPP Object with id [%s]", object.getId()));
     	for (XmppObjectFilter filter: filters) {		    		
     		try {
-    	    	log("Invoking filter " + filter);
+    			log.trace("Invoking filter " + filter);
     			filter.filter(object);
-				log(String.format("Filter [%s] has finished its work", filter));
+    			log.trace(String.format("Filter [%s] has finished its work", filter));
 			} catch (Exception e) {
 				e.printStackTrace();
     			dispatch(new Error(Condition.undefined_condition, Type.cancel, String.format("Error on client filter: %s - %s",e.getClass(),e.getMessage())));  
 			}    		
-    	}                  		
+    	}   
+    	log.trace(String.format("Done invoking filters", object.getId()));
 	}
     
     @Override
@@ -133,29 +136,24 @@ public class UnboundedQueueMessageDispatcher implements MessageDispatcher {
     	filters.clear();
     	stanzaListeners.clear();
     }
-    
-    private void log(String value) {
-    	
-    	System.out.println(String.format("[   ] [%s] [%s] [%s]", DateFormatUtils.format(new Date(),"hh:mm:ss.SSS"), Thread.currentThread(), value));
-    }
 
 	private void process(XmppObject object) {
-		log(String.format("Fetched XMPP Object [%s] from the dispatching queue", object));
+		log.trace(String.format("Fetched XMPP Object [%s] from the dispatching queue", object));
 		for(StanzaListener listener: stanzaListeners) {
 			if (object instanceof IQ) {
-				log(String.format("Invoking listener [%s] onIQ method with IQ id [%s]", listener, object.getId()));
+				log.trace(String.format("Invoking listener [%s] onIQ method with IQ id [%s]", listener, object.getId()));
 				listener.onIQ((IQ)object);
 			} else if (object instanceof Presence) {
-				log(String.format("Invoking listener [%s] onPresence method  with presence id [%s]", listener, object.getId()));
+				log.trace(String.format("Invoking listener [%s] onPresence method  with presence id [%s]", listener, object.getId()));
 				listener.onPresence((Presence)object);
 			} else if (object instanceof Message) {
-				log(String.format("Invoking listener [%s] onMessage method with message id [%s]", listener, object.getId()));
+				log.trace(String.format("Invoking listener [%s] onMessage method with message id [%s]", listener, object.getId()));
 				listener.onMessage((Message)object);
 			} else if (object instanceof Error) {
-				log(String.format("Invoking listener [%s] onError method with error id [%s]", listener, object.getId()));
+				log.trace(String.format("Invoking listener [%s] onError method with error id [%s]", listener, object.getId()));
 				listener.onError((Error)object);
 			}
-			log(String.format("Listener [%s] has finished its work", listener));
+			log.trace(String.format("Listener [%s] has finished its work", listener));
 		}		
 	}
 }

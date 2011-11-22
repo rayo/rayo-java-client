@@ -3,10 +3,10 @@ package com.rayo.client.io;
 import java.io.Reader;
 import java.net.SocketException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.apache.commons.lang.time.DateFormatUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xmlpull.mxp1.MXParser;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -29,6 +29,8 @@ import com.rayo.client.xmpp.stanza.sasl.Challenge;
 import com.rayo.client.xmpp.stanza.sasl.Success;
 
 public class XmppReaderWorker implements Runnable, StanzaListenerSupport, XmppObjectFilterSupport {
+	
+	private Logger log = LoggerFactory.getLogger(XmppReaderWorker.class);
 	
 	private XmlPullParser parser;
 	private String connectionId;
@@ -354,7 +356,6 @@ public class XmppReaderWorker implements Runnable, StanzaListenerSupport, XmppOb
     
     private void log(String value) {
     	
-    	System.out.println(String.format("[IN ] [%s] [%s] [%s]", DateFormatUtils.format(new Date(),"hh:mm:ss.SSS"), Thread.currentThread(), value));
+    	log.debug(String.format("[IN ] [%s]", value));
     }
-
 }

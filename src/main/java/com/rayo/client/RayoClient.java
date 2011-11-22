@@ -14,6 +14,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.media.mscontrol.join.Joinable;
 
 import org.joda.time.Duration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.rayo.client.auth.AuthenticationListener;
 import com.rayo.client.exception.DialTimeoutException;
@@ -78,6 +80,8 @@ import com.voxeo.moho.Participant.JoinType;
  */
 public class RayoClient {
 
+	private Logger logger = LoggerFactory.getLogger(RayoClient.class);
+	
 	protected final XmppConnection connection;
 	private static final String DEFAULT_RESOURCE = "voxeo";
 
@@ -159,7 +163,6 @@ public class RayoClient {
 	 */
 	public void connect(String username, String password, String resource, int timeout) throws XmppException {
 		
-		System.out.println("Connecting with Rayo Client instance: " + this);
 		Lock lock = connectionLock.writeLock();
 		lock.lock();
 		
@@ -172,7 +175,7 @@ public class RayoClient {
 		}		
 		
 		try {
-			System.out.println("[INFO] Connecting Rayo client XMPP Connection");
+			logger.info("Connecting Rayo client XMPP Connection");
 			if (!connection.isConnected()) {
 				connection.connect(timeout);
 				connection.login(username, password, resource, timeout);
@@ -238,15 +241,15 @@ public class RayoClient {
 					}
 				});
 			} else {
-				System.out.println("[ERROR] Trying to connect while the old XMPP connection is active. Please, disconnect first");
+				logger.error("Trying to connect while the old XMPP connection is active. Please, disconnect first");
 			}
-			System.out.println("[INFO] Rayo client is now connected");
+			logger.info("Rayo client is now connected");
 		} catch (XmppException xe) {
-			System.out.println("[ERROR] Error while trying to opean an XMPP connection");
+			logger.error("Error while trying to opean an XMPP connection");
 			xe.printStackTrace();
 			throw xe;
 		} catch (Exception e) {
-			System.out.println("[ERROR] Error while trying to opean an XMPP connection");
+			logger.error("Error while trying to opean an XMPP connection");
 			e.printStackTrace();
 			throw new XmppException(e.getMessage());
 		} finally {
@@ -394,14 +397,14 @@ public class RayoClient {
 		Lock lock = connectionLock.writeLock();
 		lock.lock();
 		try {
-			System.out.println("[INFO] Disconnecting Rayo client XMPP Connection");
+			logger.info("Disconnecting Rayo client XMPP Connection");
 			if (connection.isConnected()) {
 				broadcastUnavailability();
 				
 				connection.disconnect();
 			}
 		} finally {
-			System.out.println("[INFO] Rayo Client XMPP Connection has been disconnected");
+			logger.info("Rayo Client XMPP Connection has been disconnected");
 			lock.unlock();
 		}
 	}

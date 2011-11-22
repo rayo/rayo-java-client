@@ -28,9 +28,4 @@ public class JmxClient {
 		  J4pExecResponse resp = client.execute(req);
 		  return resp.getValue();
 	}
-	
-	public static void main(String[] args) throws Exception {
-		
-		System.out.print(new JmxClient("localhost","8080").jmxValue("com.rayo:Type=MixerStatistics", "ActiveMixersCount"));
-	}
 }

@@ -17,13 +17,13 @@ public class JmxClient {
 
 	public JmxClient(String hostname, String port) {
 		
-		if (System.getProperty("hudson.ec2") != null) {
+		if (System.getProperty("hudson.append.ext") != null && !hostname.contains("-ext")) {
 			// Small "hack" needed for Hudson functional tests. Otherwise the 
 			// tests run on hudson aren't able to access the nodes JMX interfaces
 			// as the gateway will return the internal domains for the rayo nodes.
 			String[] parts = StringUtils.split(hostname,".");
 			parts[0] = parts[0] + "-ext";
-			hostname = StringUtils.join(parts);
+			hostname = StringUtils.join(parts,".");
 			log.debug("Using hostname: " + hostname);
 		}
 		

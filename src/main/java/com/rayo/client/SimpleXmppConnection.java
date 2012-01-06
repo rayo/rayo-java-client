@@ -304,6 +304,7 @@ public class SimpleXmppConnection implements XmppConnection {
 	public void login(String username, String password, String resourceName, int timeout) throws XmppException {
 
 		loggingIn = true;
+		log.debug("Logging in as " + username + " and resource " + resourceName);
 		authenticationHandler.login(username, password, resourceName, timeout);
 		
 		loggingIn = false;

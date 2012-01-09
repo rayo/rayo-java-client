@@ -83,7 +83,7 @@ public class RayoClient {
 	private Logger logger = LoggerFactory.getLogger(RayoClient.class);
 	
 	protected final XmppConnection connection;
-	private static final String DEFAULT_RESOURCE = "voxeo";
+	public static final String DEFAULT_RESOURCE = "voxeo";
 
 	private CallsRegistry callRegistry = new CallsRegistry();
 	

@@ -1,3 +1,7 @@
+# THIS PROJECT IS DEPRECATED !!!!
+
+This project has been merged with moho [moho](https://github.com/voxeolabs/moho) into a its subproject [moho-remote](https://github.com/voxeolabs/moho/tree/master/moho-remote). 
+
 # Rayo Java Client Library
 
 This client library lets you build Rayo applications in Java. It is a very lightweight library that lets you create Rayo applications with very few lines of code. 
